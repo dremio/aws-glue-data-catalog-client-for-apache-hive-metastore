@@ -161,7 +161,7 @@ public class AWSCatalogMetastoreClient implements IMetaStoreClient {
   private final GlueMetastoreClientDelegate glueMetastoreClientDelegate;
   private final String catalogId;
   private final CatalogToHiveConverter catalogToHiveConverter;
-  
+
   private static final int BATCH_DELETE_PARTITIONS_PAGE_SIZE = 25;
   private static final int BATCH_DELETE_PARTITIONS_THREADS_COUNT = 5;
   static final String BATCH_DELETE_PARTITIONS_THREAD_POOL_NAME_FORMAT = "batch-delete-partitions-%d";
@@ -232,7 +232,7 @@ public class AWSCatalogMetastoreClient implements IMetaStoreClient {
       this.glueMetastoreClientDelegate = clientDelegate;
       return this;
     }
-    
+
     public AWSCatalogMetastoreClient build() throws MetaException {
       return new AWSCatalogMetastoreClient(this);
     }
@@ -427,7 +427,6 @@ public class AWSCatalogMetastoreClient implements IMetaStoreClient {
     glueMetastoreClientDelegate.alterFunction(dbName, functionName, newFunction);
   }
 
-  @Override
   public void alter_partition(
       String dbName,
       String tblName,
@@ -720,14 +719,8 @@ public class AWSCatalogMetastoreClient implements IMetaStoreClient {
   }
 
   @Override
-  public CompactionResponse compact2(
-      String dbName,
-      String tblName,
-      String partitionName,
-      CompactionType compactionType,
-      Map<String, String> tblProperties
-  ) throws TException {
-    return glueMetastoreClientDelegate.compact2(dbName, tblName, partitionName, compactionType, tblProperties);
+  public CompactionResponse compact2(String s, String s1, String s2, CompactionType compactionType, Map<String, String> map) throws TException {
+    throw new UnsupportedOperationException("compact2 is not supported.");
   }
 
   @Override
@@ -1368,7 +1361,6 @@ public class AWSCatalogMetastoreClient implements IMetaStoreClient {
     return glueMetastoreClientDelegate.getTables(dbname, tablePattern);
   }
 
-  @Override
   public List<String> getTables(String dbname, String tablePattern, TableType tableType)
       throws MetaException, TException, UnknownDBException {
     return glueMetastoreClientDelegate.getTables(dbname, tablePattern, tableType);

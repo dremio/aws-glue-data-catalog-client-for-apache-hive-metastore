@@ -16,7 +16,6 @@
 
     <modules>
         <module>common</module>
-        <module>spark-hive-shims</module>
         <module>hive3-shims</module>
         <module>loader</module>
     </modules>
