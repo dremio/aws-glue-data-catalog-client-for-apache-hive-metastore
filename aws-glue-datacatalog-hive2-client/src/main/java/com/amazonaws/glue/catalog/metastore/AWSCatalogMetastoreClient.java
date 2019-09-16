@@ -97,7 +97,6 @@ import org.apache.hadoop.hive.metastore.api.UnknownDBException;
 import org.apache.hadoop.hive.metastore.api.UnknownPartitionException;
 import org.apache.hadoop.hive.metastore.api.UnknownTableException;
 import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants;
-import org.apache.hadoop.hive.metastore.api.CompactionResponse;
 import org.apache.hadoop.hive.metastore.partition.spec.PartitionSpecProxy;
 import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
@@ -376,7 +375,6 @@ public class AWSCatalogMetastoreClient implements IMetaStoreClient {
     alter_table(dbName, tblName, originTable);
   }
 
-  @Override
   public void alter_partition(
       String dbName,
       String tblName,
@@ -395,7 +393,6 @@ public class AWSCatalogMetastoreClient implements IMetaStoreClient {
     glueMetastoreClientDelegate.alterPartitions(dbName, tblName, Lists.newArrayList(partition));
   }
 
-  @Override
   public void alter_partitions(
       String dbName,
       String tblName,
@@ -420,7 +417,6 @@ public class AWSCatalogMetastoreClient implements IMetaStoreClient {
     glueMetastoreClientDelegate.alterTable(dbName, tblName, table, null);
   }
 
-  @Override
   public void alter_table(String dbName, String tblName, org.apache.hadoop.hive.metastore.api.Table table, boolean cascade)
       throws InvalidOperationException, MetaException, TException {
     glueMetastoreClientDelegate.alterTable(dbName, tblName, table, null);
@@ -594,17 +590,6 @@ public class AWSCatalogMetastoreClient implements IMetaStoreClient {
       Map<String, String> tblProperties
   ) throws TException {
     glueMetastoreClientDelegate.compact(dbName, tblName, partitionName, compactionType, tblProperties);
-  }
-
-  @Override
-  public CompactionResponse compact2(
-      String dbName,
-      String tblName,
-      String partitionName,
-      CompactionType compactionType,
-      Map<String, String> tblProperties
-  ) throws TException {
-    return glueMetastoreClientDelegate.compact2(dbName, tblName, partitionName, compactionType, tblProperties);
   }
 
   @Override
@@ -1114,7 +1099,6 @@ public class AWSCatalogMetastoreClient implements IMetaStoreClient {
     return glueMetastoreClientDelegate.getTables(dbname, tablePattern);
   }
 
-  @Override
   public List<String> getTables(String dbname, String tablePattern, TableType tableType)
       throws MetaException, TException, UnknownDBException {
     return glueMetastoreClientDelegate.getTables(dbname, tablePattern, tableType);
@@ -1693,7 +1677,6 @@ public class AWSCatalogMetastoreClient implements IMetaStoreClient {
     glueMetastoreClientDelegate.addDynamicPartitions(txnId, dbName, tblName, partNames, operationType);
   }
 
-  @Override
   public void insertTable(org.apache.hadoop.hive.metastore.api.Table table, boolean overwrite) throws MetaException {
     glueMetastoreClientDelegate.insertTable(table, overwrite);
   }

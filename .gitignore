@@ -1,0 +1,12 @@
+.*/
+.buildpath
+.checkstyle
+.classpath
+.project
+*~
+*.log
+*.lck
+*.iml
+*.patch
+*.DS_Store
+target/
