@@ -120,7 +120,6 @@ import static com.amazonaws.glue.catalog.converters.ConverterUtils.stringToCatal
 import static com.amazonaws.glue.catalog.metastore.GlueMetastoreClientDelegate.INDEX_PREFIX;
 import static com.amazonaws.glue.catalog.util.MetastoreClientUtils.isExternalTable;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.apache.hadoop.hive.metastore.MetaStoreUtils.DEFAULT_DATABASE_COMMENT;
 import static org.apache.hadoop.hive.metastore.MetaStoreUtils.DEFAULT_DATABASE_NAME;
 
 public class AWSCatalogMetastoreClient implements IMetaStoreClient {
@@ -162,9 +161,6 @@ public class AWSCatalogMetastoreClient implements IMetaStoreClient {
 
     snapshotActiveConf();
     catalogId = MetastoreClientUtils.getCatalogId(conf);
-    if (!doesDefaultDBExist()) {
-      createDefaultDatabase();
-    }
   }
 
   /**
@@ -226,56 +222,6 @@ public class AWSCatalogMetastoreClient implements IMetaStoreClient {
     GlueClientFactory clientFactory = Objects.firstNonNull(builder.clientFactory, new AWSGlueClientFactory(conf));
     glueClient = clientFactory.newClient();
     glueMetastoreClientDelegate = new GlueMetastoreClientDelegate(this.conf, glueClient, wh);
-
-    /**
-     * It seems weird to create databases as part of client construction. This
-     * part should probably be moved to the section in hive code right after the
-     * metastore client is instantiated. For now, simply copying the
-     * functionality in the thrift server
-     */
-    if(builder.createDefaults && !doesDefaultDBExist()) {
-      createDefaultDatabase();
-    }
-  }
-
-  private boolean doesDefaultDBExist() throws MetaException {
-    
-    try {
-      GetDatabaseRequest getDatabaseRequest = new GetDatabaseRequest().withName(DEFAULT_DATABASE_NAME).withCatalogId(
-          catalogId);
-      glueClient.getDatabase(getDatabaseRequest);
-    } catch (EntityNotFoundException e) {
-      return false;
-    } catch (AmazonServiceException e) {
-      String msg = "Unable to verify existence of default database: ";
-      logger.error(msg, e);
-      throw new MetaException(msg + e);
-    }
-    return true;
-  }
-
-  private void createDefaultDatabase() throws MetaException {
-    Database defaultDB = new Database();
-    defaultDB.setName(DEFAULT_DATABASE_NAME);
-    defaultDB.setDescription(DEFAULT_DATABASE_COMMENT);
-    defaultDB.setLocationUri(wh.getDefaultDatabasePath(DEFAULT_DATABASE_NAME).toString());
-
-    org.apache.hadoop.hive.metastore.api.PrincipalPrivilegeSet principalPrivilegeSet
-          = new org.apache.hadoop.hive.metastore.api.PrincipalPrivilegeSet();
-    principalPrivilegeSet.setRolePrivileges(Maps.<String, List<org.apache.hadoop.hive.metastore.api.PrivilegeGrantInfo>>newHashMap());
-
-    defaultDB.setPrivileges(principalPrivilegeSet);
-
-    /**
-     * TODO: Grant access to role PUBLIC after role support is added
-     */
-    try {
-      createDatabase(defaultDB);
-    } catch (org.apache.hadoop.hive.metastore.api.AlreadyExistsException e) {
-      logger.warn("database - default already exists. Ignoring..");
-    } catch (Exception e) {
-      logger.error("Unable to create default database", e);
-    }
   }
 
   @Override
