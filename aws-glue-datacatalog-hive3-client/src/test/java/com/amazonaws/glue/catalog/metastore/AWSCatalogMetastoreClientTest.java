@@ -73,6 +73,7 @@ import org.apache.hadoop.hive.metastore.utils.ObjectPair;
 import org.apache.hadoop.hive.ql.plan.ExprNodeGenericFuncDesc;
 import org.apache.thrift.TException;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -167,6 +168,7 @@ public class AWSCatalogMetastoreClientTest {
   }
 
   @Test
+  @Ignore // default DB creation is turned off
   public void testDefaultNamespaceCreation() throws Exception {
     doThrow(new EntityNotFoundException("")).when(glueClient).getDatabase(any(GetDatabaseRequest.class));
     metastoreClient = new AWSCatalogMetastoreClient.Builder().withClientFactory(clientFactory)
