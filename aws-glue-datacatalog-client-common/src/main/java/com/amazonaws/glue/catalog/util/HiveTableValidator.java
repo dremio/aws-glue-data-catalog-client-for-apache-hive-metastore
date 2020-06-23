@@ -12,29 +12,8 @@ public enum HiveTableValidator {
 
   REQUIRED_PROPERTIES_VALIDATOR {
     public void validate(Table table) {
-      String missingProperty = null;
-
-      if(notApplicableTableType(table)) {
-        return;
-      }
-
-      if (table.getTableType() == null) {
-        missingProperty = "TableType";
-      } else if (table.getStorageDescriptor() == null) {
-        missingProperty = "StorageDescriptor";
-      } else if (table.getStorageDescriptor().getInputFormat() == null) {
-        missingProperty = "StorageDescriptor#InputFormat";
-      } else if (table.getStorageDescriptor().getOutputFormat() == null) {
-        missingProperty = "StorageDescriptor#OutputFormat";
-      } else if (table.getStorageDescriptor().getSerdeInfo() == null) {
-        missingProperty = "StorageDescriptor#SerdeInfo";
-      } else if (table.getStorageDescriptor().getSerdeInfo().getSerializationLibrary() == null) {
-        missingProperty = "StorageDescriptor#SerdeInfo#SerializationLibrary";
-      }
-
-      if (missingProperty != null) {
-        throw new InvalidInputException(String.format("%s cannot be null for table: %s", missingProperty, table.getName()));
-      }
+      // no-op since we only read data, and we can
+      // validate at calling side
     }
   };
 
