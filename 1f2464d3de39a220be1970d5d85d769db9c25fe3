@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dbb85d53_6aa3f3d5",
+        "filename": "aws-glue-datacatalog-client-common/src/main/java/com/amazonaws/glue/catalog/util/HiveTableValidator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1000057
+      },
+      "writtenOn": "2020-06-23T08:52:48Z",
+      "side": 0,
+      "message": "Cant the mock create tables that are notApplicable?\n\nFor e.g. create new TableType.MOCK_TABLE or something like that",
+      "revId": "1f2464d3de39a220be1970d5d85d769db9c25fe3",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de",
+      "unresolved": true
+    }
+  ]
+}
