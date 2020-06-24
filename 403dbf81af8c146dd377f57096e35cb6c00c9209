@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4bdf55a1_1e2ea487",
+        "filename": "aws-glue-datacatalog-hive2-client/src/main/java/com/amazonaws/glue/catalog/metastore/MockAWSCatalogMetastoreClient.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1000136
+      },
+      "writtenOn": "2020-06-24T08:14:23Z",
+      "side": 1,
+      "message": "Which JSON do we use for creating mockstore?",
+      "revId": "403dbf81af8c146dd377f57096e35cb6c00c9209",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d40d88ae_e24883c0",
+        "filename": "aws-glue-datacatalog-hive2-client/src/main/java/com/amazonaws/glue/catalog/metastore/MockStore.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 1000136
+      },
+      "writtenOn": "2020-06-24T08:14:23Z",
+      "side": 1,
+      "message": "why not use json objectmapper since there are so many fields?",
+      "revId": "403dbf81af8c146dd377f57096e35cb6c00c9209",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de",
+      "unresolved": true
+    }
+  ]
+}
