@@ -200,4 +200,49 @@ public class EntityConversionTest {
     assertNotNull(hiveTable.getPartitionKeys());
     assertTrue(hiveTable.getPartitionKeys().isEmpty());
   }
+
+  private void verifyReplaceSupportedTypes(String input, String expected) {
+    assertEquals(expected, CatalogToHiveConverter.replaceSupportedTypeNames(input));
+    assertEquals(expected, CatalogToHiveConverter.replaceSupportedTypeNames(input.toUpperCase()).toLowerCase());
+  }
+  @Test
+  public void testReplaceSupportedTypes() {
+    verifyReplaceSupportedTypes("struct<char:char,varchar:varchar," +
+            "charcol:char,varcharcol:varchar,char_col:char,varchar_col:varchar>",
+    "struct<char:string,varchar:string,charcol:string," +
+            "varcharcol:string,char_col:string,varchar_col:string>");
+
+    verifyReplaceSupportedTypes("struct<char:char(19),varchar:varchar(19)," +
+            "charcol:char(19),varcharcol:varchar(19),char_col:char(19),varchar_col:varchar(19)>",
+            "struct<char:char(19),varchar:varchar(19),charcol:char(19)," +
+                    "varcharcol:varchar(19),char_col:char(19),varchar_col:varchar(19)>");
+
+    verifyReplaceSupportedTypes("char", "string");
+    verifyReplaceSupportedTypes("varchar", "string");
+    verifyReplaceSupportedTypes("char(5)", "char(5)");
+    verifyReplaceSupportedTypes("varchar(5)", "varchar(5)");
+    verifyReplaceSupportedTypes("array<char>", "array<string>");
+    verifyReplaceSupportedTypes("array<varchar>", "array<string>");
+    verifyReplaceSupportedTypes("array<char(3)>", "array<char(3)>");
+    verifyReplaceSupportedTypes("array<varchar(3)>", "array<varchar(3)>");
+    verifyReplaceSupportedTypes("map<char,int>", "map<string,int>");
+    verifyReplaceSupportedTypes("map<varchar,int>", "map<string,int>");
+    verifyReplaceSupportedTypes("map<char(3),int>", "map<char(3),int>");
+    verifyReplaceSupportedTypes("map<varchar(3),int>", "map<varchar(3),int>");
+    verifyReplaceSupportedTypes("struct<f1:char,f2:varchar,f3:char(4),f4:varchar(34)",
+            "struct<f1:string,f2:string,f3:char(4),f4:varchar(34)");
+    verifyReplaceSupportedTypes("array<struct<varchar:char,abc:array<char>>",
+            "array<struct<varchar:string,abc:array<string>>");
+    verifyReplaceSupportedTypes("struct<charf1:char,f2char:varchar,varcharf3:char(4),f4varchar:varchar(34)",
+            "struct<charf1:string,f2char:string,varcharf3:char(4),f4varchar:varchar(34)");
+    verifyReplaceSupportedTypes("struct<char_f1:char,f2_char:varchar,varchar_f3:char(4),f4_varchar:varchar(34)",
+            "struct<char_f1:string,f2_char:string,varchar_f3:char(4),f4_varchar:varchar(34)");
+
+    verifyReplaceSupportedTypes("DOUBLE",
+            "double");
+    verifyReplaceSupportedTypes("struct<f1:DOUBLE,F1:double>",
+            "struct<f1:double,f1:double>");
+    verifyReplaceSupportedTypes("struct<f1:DOUBLE,F1:double,f2:array<CHAR>>",
+            "struct<f1:double,f1:double,f2:array<string>>");
+  }
 }
