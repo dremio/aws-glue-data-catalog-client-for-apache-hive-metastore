@@ -21,6 +21,7 @@ import org.apache.hadoop.hive.metastore.api.SkewedInfo;
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.api.TableMeta;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
 import com.google.common.collect.ImmutableMap;
@@ -111,9 +112,27 @@ public class CatalogToHiveConverter {
     return hiveDatabase;
   }
 
+  public static String replaceSupportedTypeNames(final String typeName) {
+    // Replace char and varchar types that have no length specified with string type
+
+    return typeName.replaceAll("\\s","")
+            .replaceAll("(?i)\\b(char|varchar)\\b(?![(:])", "string")
+            .toLowerCase();
+  }
+
   public static FieldSchema convertFieldSchema(com.amazonaws.services.glue.model.Column catalogFieldSchema) {
+
+    String typeName = replaceSupportedTypeNames(catalogFieldSchema.getType());
+    try {
+      // Make sure Hive can parse the type name
+      TypeInfoUtils.getTypeInfoFromTypeString(typeName);
+    } catch (IllegalArgumentException iae) {
+      // Failed to parse type name. Returning null drops the field
+      return null;
+    }
+
     FieldSchema hiveFieldSchema = new FieldSchema();
-    hiveFieldSchema.setType(catalogFieldSchema.getType());
+    hiveFieldSchema.setType(typeName);
     hiveFieldSchema.setName(catalogFieldSchema.getName());
     hiveFieldSchema.setComment(catalogFieldSchema.getComment());
 
@@ -126,7 +145,10 @@ public class CatalogToHiveConverter {
       return hiveFieldSchemaList;
     }
     for (com.amazonaws.services.glue.model.Column catalogFieldSchema : catalogFieldSchemaList){
-      hiveFieldSchemaList.add(convertFieldSchema(catalogFieldSchema));
+      FieldSchema hiveFieldSchema = convertFieldSchema(catalogFieldSchema);
+      if (hiveFieldSchema != null) {
+        hiveFieldSchemaList.add(hiveFieldSchema);
+      }
     }
 
     return hiveFieldSchemaList;
