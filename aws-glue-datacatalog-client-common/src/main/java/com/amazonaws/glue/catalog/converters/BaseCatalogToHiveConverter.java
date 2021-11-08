@@ -42,6 +42,7 @@ import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.StringColumnStatsData;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.api.TableMeta;
+import org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
@@ -175,7 +176,7 @@ public class BaseCatalogToHiveConverter implements CatalogToHiveConverter {
     Date lastAccessedTime = catalogTable.getLastAccessTime();
     hiveTable.setLastAccessTime(lastAccessedTime == null ? 0 : (int) (lastAccessedTime.getTime() / 1000));
     hiveTable.setRetention(catalogTable.getRetention());
-    hiveTable.setSd(convertStorageDescriptor(catalogTable.getStorageDescriptor()));
+    hiveTable.setSd(convertStorageDescriptorForTableObject(catalogTable.getStorageDescriptor()));
     hiveTable.setPartitionKeys(convertFieldSchemaList(catalogTable.getPartitionKeys()));
     // Hive may throw a NPE during dropTable if the parameter map is null.
     Map<String, String> parameterMap = catalogTable.getParameters();
@@ -201,6 +202,16 @@ public class BaseCatalogToHiveConverter implements CatalogToHiveConverter {
     return tableMeta;
   }
 
+  public static StorageDescriptor convertEmptyStorageDescriptor() {
+    StorageDescriptor hiveSd = new StorageDescriptor();
+    hiveSd.setInputFormat("org.apache.hadoop.mapred.FileInputFormat");
+    hiveSd.setOutputFormat("org.apache.hadoop.mapred.FileOutputFormat");
+    hiveSd.setCols(new ArrayList<FieldSchema>());
+    hiveSd.setSerdeInfo(new SerDeInfo(null, LazySimpleSerDe.class.getName(), new HashMap<String, String>()));
+    hiveSd.setSortCols(new ArrayList<Order>());
+    return hiveSd;
+  }
+
   public StorageDescriptor convertStorageDescriptor(com.amazonaws.services.glue.model.StorageDescriptor catalogSd) {
     StorageDescriptor hiveSd = new StorageDescriptor();
     hiveSd.setCols(convertFieldSchemaList(catalogSd.getColumns()));
@@ -217,6 +228,10 @@ public class BaseCatalogToHiveConverter implements CatalogToHiveConverter {
     hiveSd.setStoredAsSubDirectories(catalogSd.getStoredAsSubDirectories());
 
     return hiveSd;
+  }
+
+  public StorageDescriptor convertStorageDescriptorForTableObject(com.amazonaws.services.glue.model.StorageDescriptor catalogSd) {
+    return catalogSd == null ? convertEmptyStorageDescriptor() : convertStorageDescriptor(catalogSd);
   }
 
   public Order convertOrder(com.amazonaws.services.glue.model.Order catalogOrder) {
