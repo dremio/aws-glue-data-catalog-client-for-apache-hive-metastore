@@ -21,7 +21,10 @@ import org.apache.hadoop.hive.metastore.api.SkewedInfo;
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.api.TableMeta;
+import org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
+import org.apache.hadoop.mapred.FileInputFormat;
+import org.apache.hadoop.mapred.FileOutputFormat;
 import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
 import com.google.common.collect.ImmutableMap;
@@ -163,7 +166,7 @@ public class CatalogToHiveConverter {
     Date lastAccessedTime = catalogTable.getLastAccessTime();
     hiveTable.setLastAccessTime(lastAccessedTime == null ? 0 : (int) (lastAccessedTime.getTime() / 1000));
     hiveTable.setRetention(catalogTable.getRetention());
-    hiveTable.setSd(convertStorageDescriptor(catalogTable.getStorageDescriptor()));
+    hiveTable.setSd(convertStorageDescriptorForTableObject(catalogTable.getStorageDescriptor()));
     hiveTable.setPartitionKeys(convertFieldSchemaList(catalogTable.getPartitionKeys()));
     // Hive may throw a NPE during dropTable if the parameter map is null.
     Map<String, String> parameterMap = catalogTable.getParameters();
@@ -189,6 +192,17 @@ public class CatalogToHiveConverter {
     return tableMeta;
   }
 
+  public static StorageDescriptor convertEmptyStorageDescriptor() {
+    StorageDescriptor hiveSd = new StorageDescriptor();
+    hiveSd.setInputFormat(FileInputFormat.class.getName());
+    hiveSd.setOutputFormat(FileOutputFormat.class.getName());
+    hiveSd.setCols(new ArrayList<FieldSchema>());
+    hiveSd.setSerdeInfo(new SerDeInfo(null, LazySimpleSerDe.class.getName(), new HashMap<String, String>()));
+    hiveSd.setSortCols(new ArrayList<Order>());
+    return hiveSd;
+  }
+
+
   public static StorageDescriptor convertStorageDescriptor(com.amazonaws.services.glue.model.StorageDescriptor catalogSd) {
     StorageDescriptor hiveSd = new StorageDescriptor();
     hiveSd.setCols(convertFieldSchemaList(catalogSd.getColumns()));
@@ -205,6 +219,10 @@ public class CatalogToHiveConverter {
     hiveSd.setStoredAsSubDirectories(catalogSd.getStoredAsSubDirectories());
 
     return hiveSd;
+  }
+
+  public static StorageDescriptor convertStorageDescriptorForTableObject(com.amazonaws.services.glue.model.StorageDescriptor catalogSd) {
+    return catalogSd == null ? convertEmptyStorageDescriptor() : convertStorageDescriptor(catalogSd);
   }
 
   public static Order convertOrder(com.amazonaws.services.glue.model.Order catalogOrder) {
@@ -254,7 +272,7 @@ public class CatalogToHiveConverter {
     hiveIndex.setIndexName(catalogTable.getName());
     hiveIndex.setCreateTime((int) (catalogTable.getCreateTime().getTime() / 1000));
     hiveIndex.setLastAccessTime((int) (catalogTable.getLastAccessTime().getTime() / 1000));
-    hiveIndex.setSd(convertStorageDescriptor(catalogTable.getStorageDescriptor()));
+    hiveIndex.setSd(convertStorageDescriptorForTableObject(catalogTable.getStorageDescriptor()));
     hiveIndex.setParameters(catalogTable.getParameters());
 
     hiveIndex.setDeferredRebuild(parameters.get(INDEX_DEFERRED_REBUILD).equals("TRUE"));
