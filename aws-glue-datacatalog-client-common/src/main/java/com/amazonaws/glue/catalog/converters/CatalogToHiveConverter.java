@@ -21,7 +21,10 @@ import org.apache.hadoop.hive.metastore.api.SkewedInfo;
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.api.TableMeta;
+import org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
+import org.apache.hadoop.mapred.FileInputFormat;
+import org.apache.hadoop.mapred.FileOutputFormat;
 import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
 import com.google.common.collect.ImmutableMap;
@@ -191,6 +194,14 @@ public class CatalogToHiveConverter {
 
   public static StorageDescriptor convertStorageDescriptor(com.amazonaws.services.glue.model.StorageDescriptor catalogSd) {
     StorageDescriptor hiveSd = new StorageDescriptor();
+    if (catalogSd == null) {
+      hiveSd.setInputFormat(FileInputFormat.class.getName());
+      hiveSd.setOutputFormat(FileOutputFormat.class.getName());
+      hiveSd.setCols(new ArrayList<FieldSchema>());
+      hiveSd.setSerdeInfo(new SerDeInfo(null, LazySimpleSerDe.class.getName(), new HashMap<String, String>()));
+      hiveSd.setSortCols(new ArrayList<Order>());
+      return hiveSd;
+    }
     hiveSd.setCols(convertFieldSchemaList(catalogSd.getColumns()));
     hiveSd.setLocation(catalogSd.getLocation());
     hiveSd.setInputFormat(catalogSd.getInputFormat());
