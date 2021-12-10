@@ -78,6 +78,9 @@ public class MockStore {
         // serde properties like delimiter
         private Map<String, String> serdeprops;
 
+        // additional propertioes
+        private Map<String, String> parameters;
+
         // file size, record count
         private String sizekey;
         private String recordcount;
@@ -158,6 +161,14 @@ public class MockStore {
 
         public void setSerdeprops(Map<String, String> serdeprops) {
             this.serdeprops = serdeprops;
+        }
+
+        public Map<String, String> getParameters() {
+            return parameters;
+        }
+
+        public void setParameters(Map<String, String> parameters) {
+            this.parameters = parameters;
         }
 
         public String getSizekey() {
@@ -244,6 +255,20 @@ public class MockStore {
                     }
                 }
                 table.setSerdeprops(serdeProps);
+            }
+
+            if (tableObj.has("parameters")) {
+                JSONArray paramObj = tableObj.getJSONArray("parameters");
+                Map<String, String> parameters = new HashMap<>();
+                for (int prop = 0; prop < paramObj.length(); prop++) {
+                    JSONObject paramEntry = paramObj.getJSONObject(prop);
+                    Iterator<String> keyIter = paramEntry.keys();
+                    while (keyIter.hasNext()) {
+                        String keyName = keyIter.next();
+                        parameters.put(keyName, paramEntry.getString(keyName));
+                    }
+                }
+                table.setParameters(parameters);
             }
 
             return table;
