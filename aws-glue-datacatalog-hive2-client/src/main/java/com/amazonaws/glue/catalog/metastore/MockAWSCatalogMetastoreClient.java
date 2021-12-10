@@ -202,9 +202,14 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     private Map<String, String> getTableParameters(MockStore.MockTable selectedTable) {
-        Map<String, String> parameters = Maps.<String, String>newHashMap();
+        final Map<String, String> parameters = Maps.<String, String>newHashMap();
         parameters.put("sizeKey", selectedTable.getSizekey());
         parameters.put("recordCount", selectedTable.getRecordcount());
+        if (selectedTable.getParameters() != null) {
+            for (Map.Entry<String, String> entry: selectedTable.getParameters().entrySet()) {
+                parameters.put(entry.getKey(), entry.getValue());
+            }
+        }
         return parameters;
     }
 
