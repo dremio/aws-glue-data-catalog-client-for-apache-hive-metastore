@@ -1,0 +1,7 @@
+Code-Review+2: Thippana Vamsi Kalyan <vamsi@dremio.com>
+Verified+1: Thippana Vamsi Kalyan <vamsi@dremio.com>
+Submitted-by: Thippana Vamsi Kalyan <vamsi@dremio.com>
+Submitted-at: Thu, 24 Feb 2022 03:18:44 +0000
+Reviewed-on: https://gerrit.drem.io/gerrit/c/aws-glue-data-catalog-client-for-apache-hive-metastore/+/33731
+Project: aws-glue-data-catalog-client-for-apache-hive-metastore
+Branch: refs/heads/dremio
