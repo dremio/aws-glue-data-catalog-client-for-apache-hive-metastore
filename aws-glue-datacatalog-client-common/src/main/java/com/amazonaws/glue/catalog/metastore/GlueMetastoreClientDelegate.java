@@ -897,33 +897,69 @@ public class GlueMetastoreClientDelegate {
       partitionsToGet.add(new PartitionValueList().withValues(partitionNameToVals(partitionName)));
     }
 
-    List<List<PartitionValueList>> batchedPartitionsToGet = Lists.partition(partitionsToGet, BATCH_GET_PARTITIONS_MAX_REQUEST_SIZE);
-    List<Future<BatchGetPartitionResult>> batchGetPartitionFutures = Lists.newArrayList();
-
-    for (List<PartitionValueList> batch : batchedPartitionsToGet) {
-      final BatchGetPartitionRequest request = new BatchGetPartitionRequest()
-          .withDatabaseName(databaseName)
-          .withTableName(tableName)
-          .withPartitionsToGet(batch)
-          .withCatalogId(catalogId);
-      batchGetPartitionFutures.add(GLUE_METASTORE_DELEGATE_THREAD_POOL.submit(new Callable<BatchGetPartitionResult>() {
-        @Override
-        public BatchGetPartitionResult call() throws Exception {
-          return glueClient.batchGetPartition(request);
-        }
-      }));
-    }
-
+    final int UNPROCESSED_KEY_MAX_LOOP_COUNT = 2;
+    int unprocessedKeysLoopCount = 0;
+    int batchSize = BATCH_GET_PARTITIONS_MAX_REQUEST_SIZE;
     List<org.apache.hadoop.hive.metastore.api.Partition> result = Lists.newArrayList();
-    try {
-      for (Future<BatchGetPartitionResult> future : batchGetPartitionFutures) {
-        result.addAll(catalogToHiveConverter.convertPartitions(future.get().getPartitions()));
+    while (!partitionsToGet.isEmpty()) {
+      // If we still have unprocessed partitions after 3 passes through the loop, give up.  Since the batch size is
+      // adjusted on subsequent passes based on how many partitions are actually returned, it should only take
+      // two passes assuming Glue is consistent with the number of partitions returned for a given table schema.
+      // We allow for one additional pass to handle any small variations in the number of partitions returned per
+      // BatchGetPartitions call.
+      if (unprocessedKeysLoopCount > UNPROCESSED_KEY_MAX_LOOP_COUNT) {
+        throw new MetaException(String.format("Failed to retrieve all requested partitions from Glue in 3 passes.  " +
+                "Remaining unprocessed keys count: %d.  Adjusted batch size: %d.",
+            partitionsToGet.size(), batchSize));
       }
-    } catch (ExecutionException e) {
-      throw catalogToHiveConverter.wrapInHiveException(e.getCause());
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
+
+      List<List<PartitionValueList>> batchedPartitionsToGet = Lists.partition(partitionsToGet, batchSize);
+      List<Future<BatchGetPartitionResult>> batchGetPartitionFutures = Lists.newArrayList();
+
+      for (List<PartitionValueList> batch : batchedPartitionsToGet) {
+        final BatchGetPartitionRequest request = new BatchGetPartitionRequest()
+            .withDatabaseName(databaseName)
+            .withTableName(tableName)
+            .withPartitionsToGet(batch)
+            .withCatalogId(catalogId);
+        batchGetPartitionFutures.add(GLUE_METASTORE_DELEGATE_THREAD_POOL.submit(new Callable<BatchGetPartitionResult>() {
+          @Override
+          public BatchGetPartitionResult call() throws Exception {
+            return glueClient.batchGetPartition(request);
+          }
+        }));
+      }
+
+      List<PartitionValueList> allUnprocessedKeys = Lists.newArrayList();
+      try {
+        for (Future<BatchGetPartitionResult> future : batchGetPartitionFutures) {
+          List<Partition> partitions = future.get().getPartitions();
+          result.addAll(catalogToHiveConverter.convertPartitions(partitions));
+          // Glue may not return partition information for all requested keys - if there are unprocessed keys,
+          // add to a list that we will process on a second pass.  The batch size will be adjusted based on number
+          // of partitions that were returned here.
+          List<PartitionValueList> unprocessedKeys = future.get().getUnprocessedKeys();
+          if (unprocessedKeys != null && !unprocessedKeys.isEmpty()) {
+            allUnprocessedKeys.addAll(unprocessedKeys);
+            if (partitions.size() > 0) {
+              batchSize = Math.min(partitions.size(), batchSize);
+            }
+
+            logger.debug(String.format("BatchGetPartitions returned %d unprocessed keys on pass %d, " +
+                "updated batchSize = %d, dbName = %s, tblName = %s", unprocessedKeys.size(),
+                unprocessedKeysLoopCount + 1, batchSize, databaseName, tableName));
+          }
+        }
+      } catch (ExecutionException e) {
+        throw catalogToHiveConverter.wrapInHiveException(e.getCause());
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+
+      partitionsToGet = allUnprocessedKeys;
+      unprocessedKeysLoopCount++;
     }
+
     return result;
   }
 
