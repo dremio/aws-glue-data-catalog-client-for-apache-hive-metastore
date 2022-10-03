@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fb4c784e_761b3172",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000387
+      },
+      "writtenOn": "2022-10-03T23:54:17Z",
+      "side": 1,
+      "message": "aws-glue-data-catalog-client-for-apache-hive-metastore is one of the IMetaStoreClient implementations. There are other implementations like SessionHiveMetaStoreClient. If the issue of returning partial partition values is not limited to aws-glue-data-catalog-client-for-apache-hive-metastore, a more general fix would be at https://github.com/dremio/dremio/blob/master/oss/plugins/hive/src/main/hive2/com/dremio/exec/store/hive/HiveClientImpl.java#L284, and similar place of hive3.  \nWe could compare the input partitionNames and output partitions to figure out unprocessed partitions. but the general fix wont be as good as specific fix as you did in glue client since we cant do fine control on things like batch size. \n\nWant to leave it as an option for future reference.",
+      "parentUuid": "33a573de_0d0d3695",
+      "revId": "37e9cc74fae9192951f92494b51a87d3d43ba801",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "251b7bd0_ffc1faf8",
         "filename": "aws-glue-datacatalog-client-common/src/main/java/com/amazonaws/glue/catalog/metastore/GlueMetastoreClientDelegate.java",
         "patchSetId": 2
