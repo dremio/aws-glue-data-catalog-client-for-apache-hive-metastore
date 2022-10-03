@@ -41,6 +41,7 @@ import com.amazonaws.services.glue.model.InvalidInputException;
 import com.amazonaws.services.glue.model.OperationTimeoutException;
 import com.amazonaws.services.glue.model.Partition;
 import com.amazonaws.services.glue.model.PartitionInput;
+import com.amazonaws.services.glue.model.PartitionValueList;
 import com.amazonaws.services.glue.model.Table;
 import com.amazonaws.services.glue.model.TableInput;
 import com.amazonaws.services.glue.model.UpdateDatabaseRequest;
@@ -783,6 +784,73 @@ public class GlueMetastoreClientDelegateTest {
     metastoreClientDelegate.getPartitionsByNames(testDb.getName(), testTbl.getName(), partNames);
     verify(glueClient, times(2)).batchGetPartition(any(BatchGetPartitionRequest.class));
   }
+
+  @Test
+  public void testGetPartitionsByNameWithUnprocessedKeys() throws Exception {
+    int numPartNames = (BATCH_GET_PARTITIONS_MAX_REQUEST_SIZE * 2) + 10;
+    // only return 500 partitions per call out of up to 1000 requested
+    final int maxPartitionsPerCall = 500;
+    List<String> partNames = getTestPartitionNames(numPartNames);
+
+    when(glueClient.batchGetPartition(any(BatchGetPartitionRequest.class)))
+        .thenAnswer(new Answer<BatchGetPartitionResult>() {
+          @Override
+          public BatchGetPartitionResult answer(InvocationOnMock invocation) throws Throwable {
+            BatchGetPartitionRequest request = invocation.getArgumentAt(0, BatchGetPartitionRequest.class);
+            int npartitions = request.getPartitionsToGet().size();
+            List<Partition> partitions = Lists.newArrayList();
+            List<PartitionValueList> unprocessedKeys = Lists.newArrayList();
+            for (int n = 0; n < npartitions; n++) {
+              if (n < maxPartitionsPerCall) {
+                partitions.add(new Partition().withDatabaseName(testDb.getName())
+                    .withTableName(testTbl.getName())
+                    .withValues(request.getPartitionsToGet().get(n).getValues())
+                    .withStorageDescriptor(TestObjects.getTestStorageDescriptor()));
+              } else {
+                unprocessedKeys.add(request.getPartitionsToGet().get(n));
+              }
+            }
+
+            BatchGetPartitionResult result = new BatchGetPartitionResult()
+                .withPartitions(partitions);
+            if (!unprocessedKeys.isEmpty()) {
+              result.withUnprocessedKeys(unprocessedKeys);
+            }
+
+            return result;
+          }
+        });
+
+    List<org.apache.hadoop.hive.metastore.api.Partition> actual =
+        metastoreClientDelegate.getPartitionsByNames(testDb.getName(), testTbl.getName(), partNames);
+    assertEquals(actual.size(), partNames.size());
+    // BatchGetPartition should be called 5 times
+    // - 3 times on the 1st loop with batch sizes 1000, 1000, 9
+    // - 2 additional times to handle the 1000 remaining unprocessed keys
+    verify(glueClient, times(5)).batchGetPartition(any(BatchGetPartitionRequest.class));
+  }
+
+  @Test(expected = MetaException.class)
+  public void testGetPartitionsByNameFailsAfterThreePassesWithUnprocessedKeys() throws Exception {
+    // Simulate Glue not returning any partitions, only unprocessed keys, so that we can't retrieve all partitions
+    // after 3 passes of BatchGetPartition calls.
+    int numPartNames = (BATCH_GET_PARTITIONS_MAX_REQUEST_SIZE * 2) + 10;
+    List<String> partNames = getTestPartitionNames(numPartNames);
+
+    when(glueClient.batchGetPartition(any(BatchGetPartitionRequest.class)))
+        .thenAnswer(new Answer<BatchGetPartitionResult>() {
+          @Override
+          public BatchGetPartitionResult answer(InvocationOnMock invocation) throws Throwable {
+            BatchGetPartitionRequest request = invocation.getArgumentAt(0, BatchGetPartitionRequest.class);
+            return new BatchGetPartitionResult()
+                .withPartitions(Lists.<Partition>newArrayList())
+                .withUnprocessedKeys(request.getPartitionsToGet());
+          }
+        });
+
+    metastoreClientDelegate.getPartitionsByNames(testDb.getName(), testTbl.getName(), partNames);
+  }
+
 
   private static List<String> getTestPartitionNames(int numPartitions) {
     List<String> partNames = Lists.newArrayList();
