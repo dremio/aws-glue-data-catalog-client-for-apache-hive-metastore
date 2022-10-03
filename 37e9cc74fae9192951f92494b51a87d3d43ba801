@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2835e063_098ad072",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000387
+      },
+      "writtenOn": "2022-10-03T22:02:32Z",
+      "side": 1,
+      "message": "wondering if it is worthwhile to move the fix to generic IMetaStoreClient so that all MetaStore clients can benefit this fix.",
+      "revId": "37e9cc74fae9192951f92494b51a87d3d43ba801",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "251b7bd0_ffc1faf8",
+        "filename": "aws-glue-datacatalog-client-common/src/main/java/com/amazonaws/glue/catalog/metastore/GlueMetastoreClientDelegate.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 877,
+      "author": {
+        "id": 1000387
+      },
+      "writtenOn": "2022-10-03T22:02:32Z",
+      "side": 1,
+      "message": "define a constant?",
+      "revId": "37e9cc74fae9192951f92494b51a87d3d43ba801",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    }
+  ]
+}
