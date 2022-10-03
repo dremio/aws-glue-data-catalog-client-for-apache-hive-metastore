@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c13094e_c88f3d9b",
+        "filename": "aws-glue-datacatalog-client-common/src/main/java/com/amazonaws/glue/catalog/metastore/GlueMetastoreClientDelegate.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 877,
+      "author": {
+        "id": 1000482
+      },
+      "writtenOn": "2022-10-03T21:39:03Z",
+      "side": 1,
+      "message": "Can we make it an option? Hopefully we\u0027ll never have to use it or document but it could shave a day or a week out of next escalation.",
+      "revId": "662999642925620490e4dfac587ebe63f9127543",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "461777f3_9181b85d",
+        "filename": "aws-glue-datacatalog-client-common/src/main/java/com/amazonaws/glue/catalog/metastore/GlueMetastoreClientDelegate.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 928,
+      "author": {
+        "id": 1000482
+      },
+      "writtenOn": "2022-10-03T21:39:03Z",
+      "side": 1,
+      "message": "Could use a [debug] log with count of discovered partitions",
+      "revId": "662999642925620490e4dfac587ebe63f9127543",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    }
+  ]
+}
