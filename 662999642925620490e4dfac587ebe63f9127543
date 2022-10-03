@@ -18,6 +18,24 @@
       "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "089f2d73_db2b4722",
+        "filename": "aws-glue-datacatalog-client-common/src/main/java/com/amazonaws/glue/catalog/metastore/GlueMetastoreClientDelegate.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 877,
+      "author": {
+        "id": 1000354
+      },
+      "writtenOn": "2022-10-03T22:58:29Z",
+      "side": 1,
+      "message": "This code doesn\u0027t have access to Dremio options, and there\u0027s no way to pass in a parameter with such an option.  I could pull it from a system property but I\u0027d rather not do that for something where I\u0027m 99.9% sure we won\u0027t need it.\n\nIf we hit this error we\u0027ll know exactly what it is, and we can work around it by using the store.hive.partition_batch_size setting that controls the batch size in the caller.  That setting controls how may values are passed to this function in the partitionNames parameter.",
+      "parentUuid": "6c13094e_c88f3d9b",
+      "revId": "662999642925620490e4dfac587ebe63f9127543",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "461777f3_9181b85d",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-10-03T21:39:03Z",
       "side": 1,
       "message": "Could use a [debug] log with count of discovered partitions",
+      "revId": "662999642925620490e4dfac587ebe63f9127543",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d23456e2_a50bb21c",
+        "filename": "aws-glue-datacatalog-client-common/src/main/java/com/amazonaws/glue/catalog/metastore/GlueMetastoreClientDelegate.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 928,
+      "author": {
+        "id": 1000354
+      },
+      "writtenOn": "2022-10-03T22:58:29Z",
+      "side": 1,
+      "message": "The caller has debug logging for number of returned partitions so I omitted it here.",
+      "parentUuid": "461777f3_9181b85d",
       "revId": "662999642925620490e4dfac587ebe63f9127543",
       "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
     }
