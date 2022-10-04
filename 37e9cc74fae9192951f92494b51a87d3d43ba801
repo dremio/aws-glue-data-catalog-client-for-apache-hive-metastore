@@ -54,6 +54,24 @@
       "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2f0737e_d8dfed37",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000354
+      },
+      "writtenOn": "2022-10-04T00:15:05Z",
+      "side": 1,
+      "message": "As I said, this is a Glue-specific issue.  BatchGetPartition is a Glue API, not a Hive API.  That Glue API has the notion of \"UnprocessedKeys\".  The Hive API \"getPartitionsByNames\" has a different contract - where it\u0027s assumed it will return info on all requested partitions if they exist.  It does not have any notion of unprocessed keys.  The problem is in the translation of the Glue API to the Hive API wrapper, not a general case of some Hive API we are not handling correctly.",
+      "parentUuid": "fb4c784e_761b3172",
+      "revId": "37e9cc74fae9192951f92494b51a87d3d43ba801",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "251b7bd0_ffc1faf8",
