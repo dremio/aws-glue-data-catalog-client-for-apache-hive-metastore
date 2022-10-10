@@ -4,7 +4,9 @@ import com.amazonaws.ClientConfiguration;
 
 public final class AWSGlueConfig {
 
-  private AWSGlueConfig() {}
+  private AWSGlueConfig() {
+    //test:
+  }
 
   public static final String AWS_GLUE_ENDPOINT = "aws.glue.endpoint";
   public static final String AWS_REGION = "aws.region";
