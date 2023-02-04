@@ -68,6 +68,7 @@ import org.apache.hadoop.hive.metastore.api.AggrStats;
 import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
 import org.apache.hadoop.hive.metastore.api.ColumnStatisticsObj;
 import org.apache.hadoop.hive.metastore.api.CompactionType;
+import org.apache.hadoop.hive.metastore.api.CompactionResponse;
 import org.apache.hadoop.hive.metastore.api.CurrentNotificationEventId;
 import org.apache.hadoop.hive.metastore.api.DataOperationType;
 import org.apache.hadoop.hive.metastore.api.EnvironmentContext;
@@ -91,6 +92,8 @@ import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
 import org.apache.hadoop.hive.metastore.api.NotificationEventResponse;
 import org.apache.hadoop.hive.metastore.api.OpenTxnsResponse;
 import org.apache.hadoop.hive.metastore.api.PartitionEventType;
+import org.apache.hadoop.hive.metastore.api.PartitionValuesRequest;
+import org.apache.hadoop.hive.metastore.api.PartitionValuesResponse;
 import org.apache.hadoop.hive.metastore.api.PrincipalType;
 import org.apache.hadoop.hive.metastore.api.Role;
 import org.apache.hadoop.hive.metastore.api.SQLForeignKey;
@@ -1464,6 +1467,16 @@ public class GlueMetastoreClientDelegate {
     throw new UnsupportedOperationException("compact is not supported");
   }
 
+  public CompactionResponse compact2(
+          String dbName,
+          String tblName,
+          String partitionName,
+          CompactionType compactionType,
+          Map<String, String> tblProperties
+  ) throws TException {
+    throw new UnsupportedOperationException("compact2 is not supported");
+  }
+
   public ValidTxnList getValidTxns() throws TException {
     throw new UnsupportedOperationException("getValidTxns is not supported");
   }
@@ -1514,6 +1527,12 @@ public class GlueMetastoreClientDelegate {
       PartitionEventType eventType
   ) throws TException {
     throw new UnsupportedOperationException("isPartitionMarkedForEvent is not supported");
+  }
+
+  public PartitionValuesResponse listPartitionValues(
+          PartitionValuesRequest partitionValuesRequest
+  ) throws TException {
+    throw new UnsupportedOperationException("listPartitionValues is not yet supported");
   }
 
   public int getNumPartitionsByFilter(

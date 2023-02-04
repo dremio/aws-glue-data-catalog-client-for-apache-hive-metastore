@@ -52,6 +52,7 @@ import org.apache.hadoop.hive.metastore.TableType;
 import org.apache.hadoop.hive.metastore.Warehouse;
 import org.apache.hadoop.hive.metastore.api.AggrStats;
 import org.apache.hadoop.hive.metastore.api.ColumnStatisticsObj;
+import org.apache.hadoop.hive.metastore.api.CompactionResponse;
 import org.apache.hadoop.hive.metastore.api.CompactionType;
 import org.apache.hadoop.hive.metastore.api.ConfigValSecurityException;
 import org.apache.hadoop.hive.metastore.api.CurrentNotificationEventId;
@@ -84,6 +85,8 @@ import org.apache.hadoop.hive.metastore.api.NoSuchTxnException;
 import org.apache.hadoop.hive.metastore.api.NotificationEventResponse;
 import org.apache.hadoop.hive.metastore.api.OpenTxnsResponse;
 import org.apache.hadoop.hive.metastore.api.PartitionEventType;
+import org.apache.hadoop.hive.metastore.api.PartitionValuesRequest;
+import org.apache.hadoop.hive.metastore.api.PartitionValuesResponse;
 import org.apache.hadoop.hive.metastore.api.PrimaryKeysRequest;
 import org.apache.hadoop.hive.metastore.api.SQLForeignKey;
 import org.apache.hadoop.hive.metastore.api.SQLPrimaryKey;
@@ -536,6 +539,17 @@ public class AWSCatalogMetastoreClient implements IMetaStoreClient {
       Map<String, String> tblProperties
   ) throws TException {
     glueMetastoreClientDelegate.compact(dbName, tblName, partitionName, compactionType, tblProperties);
+  }
+
+  @Override
+  public CompactionResponse compact2(
+      String dbName,
+      String tblName,
+      String partitionName,
+      CompactionType compactionType,
+      Map<String, String> tblProperties
+  ) throws TException {
+    return glueMetastoreClientDelegate.compact2(dbName, tblName, partitionName, compactionType, tblProperties);
   }
 
   @Override
@@ -1181,6 +1195,11 @@ public class AWSCatalogMetastoreClient implements IMetaStoreClient {
                                          List<String> values, short max)
         throws MetaException, TException, NoSuchObjectException {
     return glueMetastoreClientDelegate.listPartitionNames(databaseName, tableName, values, max);
+  }
+
+  @Override
+  public PartitionValuesResponse listPartitionValues(PartitionValuesRequest partitionValuesRequest) throws TException {
+    return glueMetastoreClientDelegate.listPartitionValues(partitionValuesRequest);
   }
 
   @Override
