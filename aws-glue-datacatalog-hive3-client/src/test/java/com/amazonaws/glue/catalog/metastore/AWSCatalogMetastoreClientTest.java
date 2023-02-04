@@ -273,7 +273,7 @@ public class AWSCatalogMetastoreClientTest {
         .withValues(values2);
 
     Table table = HiveToCatalogConverter.convertTable(testTable);
-    table.setPartitionKeys(Arrays.asList(new Column().withName("foo"), new Column().withName("bar")));
+    table.setPartitionKeys(Arrays.asList(new Column().withName("foo").withType("string"), new Column().withName("bar").withType("string")));
 
     when(glueClient.getPartitions(any(GetPartitionsRequest.class)))
         .thenReturn(new GetPartitionsResult().withPartitions(Arrays.asList(partition1, partition2)));

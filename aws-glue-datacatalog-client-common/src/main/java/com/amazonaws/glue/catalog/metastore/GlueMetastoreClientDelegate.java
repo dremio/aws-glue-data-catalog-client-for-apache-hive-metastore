@@ -84,6 +84,7 @@ import org.apache.hadoop.hive.metastore.api.AggrStats;
 import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
 import org.apache.hadoop.hive.metastore.api.ColumnStatisticsObj;
 import org.apache.hadoop.hive.metastore.api.CompactionType;
+import org.apache.hadoop.hive.metastore.api.CompactionResponse;
 import org.apache.hadoop.hive.metastore.api.CurrentNotificationEventId;
 import org.apache.hadoop.hive.metastore.api.DataOperationType;
 import org.apache.hadoop.hive.metastore.api.EnvironmentContext;
@@ -1723,6 +1724,16 @@ public class GlueMetastoreClientDelegate {
       Map<String, String> tblProperties
   ) throws TException {
     throw new UnsupportedOperationException("compact is not supported");
+  }
+
+  public CompactionResponse compact2(
+          String dbName,
+          String tblName,
+          String partitionName,
+          CompactionType compactionType,
+          Map<String, String> tblProperties
+  ) throws TException {
+    throw new UnsupportedOperationException("compact2 is not supported");
   }
 
   public ValidTxnList getValidTxns() throws TException {
