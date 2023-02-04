@@ -45,6 +45,7 @@ import org.apache.hadoop.hive.metastore.api.CheckConstraintsRequest;
 import org.apache.hadoop.hive.metastore.api.CmRecycleRequest;
 import org.apache.hadoop.hive.metastore.api.CmRecycleResponse;
 import org.apache.hadoop.hive.metastore.api.ColumnStatisticsObj;
+import org.apache.hadoop.hive.metastore.api.CompactionResponse;
 import org.apache.hadoop.hive.metastore.api.CompactionType;
 import org.apache.hadoop.hive.metastore.api.ConfigValSecurityException;
 import org.apache.hadoop.hive.metastore.api.CreationMetadata;
@@ -666,8 +667,14 @@ public class AWSCatalogMetastoreClient implements IMetaStoreClient {
   }
 
   @Override
-  public CompactionResponse compact2(String s, String s1, String s2, CompactionType compactionType, Map<String, String> map) throws TException {
-    throw new UnsupportedOperationException("compact2 is not supported.");
+  public CompactionResponse compact2(
+      String dbName,
+      String tblName,
+      String partitionName,
+      CompactionType compactionType,
+      Map<String, String> tblProperties
+  ) throws TException {
+    return glueMetastoreClientDelegate.compact2(dbName, tblName, partitionName, compactionType, tblProperties);
   }
 
   @Override
