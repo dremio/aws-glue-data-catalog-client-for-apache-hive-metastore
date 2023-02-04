@@ -32,7 +32,7 @@ final class AwsGlueHive2Shims implements AwsGlueHiveShims {
 
   @Override
   public Path getDefaultTablePath(Database db, String tableName, Warehouse warehouse) throws MetaException {
-    return warehouse.getTablePath(db, tableName);
+    return warehouse.getDefaultTablePath(db, tableName);
   }
 
   @Override
