@@ -7,7 +7,7 @@
   <version>1.10.0-SNAPSHOT</version>
     <modules>
       <module>aws-glue-datacatalog-client-common</module>
-      <module>aws-glue-datacatalog-spark-client</module>
+      <!--module>aws-glue-datacatalog-spark-client</module-->
       <module>aws-glue-datacatalog-hive2-client</module>
       <module>shims</module>
     </modules>
@@ -19,9 +19,9 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <guava.version>14.0.1</guava.version>
-    <hive2.version>2.1.1-dremio-201909161537170757-9d964f7</hive2.version>
-    <spark-hive.version>1.2.1.spark</spark-hive.version>
-    <aws.sdk.version>1.11.267</aws.sdk.version>
+    <hive2.version>2.3.9-dremio-202209290028370685-7b6189f</hive2.version>
+    <spark-hive.version>1.2.1.spark2</spark-hive.version>
+    <aws.sdk.version>1.12.261</aws.sdk.version>
     <junit.version>4.11</junit.version>
     <mockito.version>1.10.19</mockito.version>
     <surefire.version>2.15</surefire.version>

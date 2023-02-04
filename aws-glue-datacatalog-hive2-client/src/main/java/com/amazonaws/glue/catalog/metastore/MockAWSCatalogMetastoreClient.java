@@ -21,6 +21,7 @@ import org.apache.hadoop.hive.metastore.TableType;
 import org.apache.hadoop.hive.metastore.Warehouse;
 import org.apache.hadoop.hive.metastore.api.AggrStats;
 import org.apache.hadoop.hive.metastore.api.ColumnStatisticsObj;
+import org.apache.hadoop.hive.metastore.api.CompactionResponse;
 import org.apache.hadoop.hive.metastore.api.CompactionType;
 import org.apache.hadoop.hive.metastore.api.ConfigValSecurityException;
 import org.apache.hadoop.hive.metastore.api.CurrentNotificationEventId;
@@ -53,6 +54,8 @@ import org.apache.hadoop.hive.metastore.api.NotificationEventResponse;
 import org.apache.hadoop.hive.metastore.api.OpenTxnsResponse;
 import org.apache.hadoop.hive.metastore.api.Order;
 import org.apache.hadoop.hive.metastore.api.PartitionEventType;
+import org.apache.hadoop.hive.metastore.api.PartitionValuesRequest;
+import org.apache.hadoop.hive.metastore.api.PartitionValuesResponse;
 import org.apache.hadoop.hive.metastore.api.PrimaryKeysRequest;
 import org.apache.hadoop.hive.metastore.api.SQLForeignKey;
 import org.apache.hadoop.hive.metastore.api.SQLPrimaryKey;
@@ -501,6 +504,17 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public CompactionResponse compact2(
+           String dbname, 
+           String tblName, 
+           String partitionName, 
+           CompactionType compactionType,
+           Map<String, String> tblproperties
+    ) throws TException {
+        return null;
+    }
+
+    @Override
     public void createFunction(org.apache.hadoop.hive.metastore.api.Function function) throws InvalidObjectException, MetaException, TException {
     }
 
@@ -855,6 +869,12 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
                                            List<String> values, short max)
             throws MetaException, TException, NoSuchObjectException {
         return Collections.emptyList();
+    }
+
+    @Override
+    public PartitionValuesResponse listPartitionValues(PartitionValuesRequest request)
+            throws MetaException, TException, NoSuchObjectException {
+        return null;
     }
 
     @Override
