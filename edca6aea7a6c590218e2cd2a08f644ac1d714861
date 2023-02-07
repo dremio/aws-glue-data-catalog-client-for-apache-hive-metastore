@@ -1,0 +1,7 @@
+Verified+1: Dmitry Chirkov <dmitry.chirkov@dremio.com>
+Code-Review+2: Yihai Zhu <yihai.zhu@dremio.com>
+Submitted-by: Dmitry Chirkov <dmitry.chirkov@dremio.com>
+Submitted-at: Tue, 07 Feb 2023 22:10:10 +0000
+Reviewed-on: https://gerrit.drem.io/gerrit/c/aws-glue-data-catalog-client-for-apache-hive-metastore/+/48245
+Project: aws-glue-data-catalog-client-for-apache-hive-metastore
+Branch: refs/heads/dremio
