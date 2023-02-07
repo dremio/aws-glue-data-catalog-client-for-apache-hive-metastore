@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a23e0dc5_0d915687",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000482
+      },
+      "writtenOn": "2023-02-07T22:07:34Z",
+      "side": 1,
+      "message": "Known 7 test failures\n\nFailed tests: \n  testRequiredProperty_OutputFormat(com.amazonaws.glue.catalog.util.HiveTableValidatorTest)\n  testRequiredProperty_SerdeInfo(com.amazonaws.glue.catalog.util.HiveTableValidatorTest)\n  testRequiredProperty_InputFormat(com.amazonaws.glue.catalog.util.HiveTableValidatorTest)\n  testRequiredProperty_StorageDescriptor(com.amazonaws.glue.catalog.util.HiveTableValidatorTest)\n  testRequiredProperty_SerializationLibrary(com.amazonaws.glue.catalog.util.HiveTableValidatorTest)\n  testRequiredProperty_TableType(com.amazonaws.glue.catalog.util.HiveTableValidatorTest)\n  testGetTableInvalidGlueTable(com.amazonaws.glue.catalog.metastore.GlueMetastoreClientDelegateTest)\n\nTests run: 190, Failures: 7, Errors: 0, Skipped: 0",
+      "revId": "edca6aea7a6c590218e2cd2a08f644ac1d714861",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    }
+  ]
+}
