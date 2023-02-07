@@ -16,6 +16,23 @@
       "message": "1. AWS SDK v1 bump introduced 3 new test failures in AWSGlueDataCatalogClientCommon (7 \"known\" failures atm)\n2. Had to bump hive2.version in order to get rid of very old jackson-databind dependency which was causing \"Could not initialize class com.amazonaws.partitions.PartitionsLoader\" and \"NoSuchFieldError: ALLOW_FINAL_FIELDS_AS_MUTATORS\" - which was causing test failure, apparently due to jackson version conflicts\n3. Hive bump from 2.1.1 to 2.3.9 brought in couple of new functions (compact2, listPartitionValues) that needed to be plugged through\n4. Commented out \"aws-glue-datacatalog-spark-client\" so I can build/test the root. Scott saying we don\u0027t use Spark client",
       "revId": "068ce0df7b5f50705f00451420325c703c01a06d",
       "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "52cebe6c_25b95cb8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000482
+      },
+      "writtenOn": "2023-02-07T06:43:46Z",
+      "side": 1,
+      "message": "Regressions with 1.12.261 bump (via Dan Huff):\nhttps://jenkins.drem.io/job/dremio-master-pipeline-regression/14209/\nhttps://jenkins.drem.io/job/dremio-master-long-regression/3412/\nBoth launched using artifacts from 150003 and SKIP_BUILD",
+      "revId": "068ce0df7b5f50705f00451420325c703c01a06d",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
     }
   ]
 }
