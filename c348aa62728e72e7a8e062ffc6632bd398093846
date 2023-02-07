@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "30a4d3cd_e21cae5d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000261
+      },
+      "writtenOn": "2023-02-07T07:27:05Z",
+      "side": 1,
+      "message": "\u003e Patch Set 6: Verified-1\n\u003e \n\u003e Build Unstable \n\u003e \n\u003e https://jenkins.drem.io/job/glue-dremio-changesets/7/ : UNSTABLE\n\nWe should check once reason for failures for this https://jenkins.drem.io/job/glue-dremio-changesets/7/com.amazonaws.glue$aws-glue-datacatalog-client-common/testReport/junit/ ",
+      "revId": "c348aa62728e72e7a8e062ffc6632bd398093846",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    }
+  ]
+}
