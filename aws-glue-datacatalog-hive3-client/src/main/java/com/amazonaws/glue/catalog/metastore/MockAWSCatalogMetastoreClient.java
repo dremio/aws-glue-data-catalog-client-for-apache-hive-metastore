@@ -1,36 +1,39 @@
 package com.amazonaws.glue.catalog.metastore;
 
-import com.amazonaws.glue.catalog.util.MetastoreClientUtils;
-import com.amazonaws.glue.shims.AwsGlueHiveShims;
-import com.amazonaws.glue.shims.ShimsLoader;
 import com.amazonaws.services.glue.model.AlreadyExistsException;
-import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.ValidTxnList;
+import org.apache.hadoop.hive.common.ValidWriteIdList;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.metastore.HiveMetaHookLoader;
 import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.PartitionDropOptions;
 import org.apache.hadoop.hive.metastore.TableType;
-import org.apache.hadoop.hive.metastore.Warehouse;
 import org.apache.hadoop.hive.metastore.api.AggrStats;
+import org.apache.hadoop.hive.metastore.api.Catalog;
+import org.apache.hadoop.hive.metastore.api.CheckConstraintsRequest;
+import org.apache.hadoop.hive.metastore.api.CmRecycleRequest;
+import org.apache.hadoop.hive.metastore.api.CmRecycleResponse;
 import org.apache.hadoop.hive.metastore.api.ColumnStatisticsObj;
+import org.apache.hadoop.hive.metastore.api.CompactionResponse;
 import org.apache.hadoop.hive.metastore.api.CompactionType;
 import org.apache.hadoop.hive.metastore.api.ConfigValSecurityException;
+import org.apache.hadoop.hive.metastore.api.CreationMetadata;
 import org.apache.hadoop.hive.metastore.api.CurrentNotificationEventId;
 import org.apache.hadoop.hive.metastore.api.DataOperationType;
 import org.apache.hadoop.hive.metastore.api.Database;
+import org.apache.hadoop.hive.metastore.api.DefaultConstraintsRequest;
 import org.apache.hadoop.hive.metastore.api.EnvironmentContext;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
+import org.apache.hadoop.hive.metastore.api.FindSchemasByColsResp;
+import org.apache.hadoop.hive.metastore.api.FindSchemasByColsRqst;
 import org.apache.hadoop.hive.metastore.api.FireEventRequest;
 import org.apache.hadoop.hive.metastore.api.FireEventResponse;
 import org.apache.hadoop.hive.metastore.api.ForeignKeysRequest;
+import org.apache.hadoop.hive.metastore.api.Function;
 import org.apache.hadoop.hive.metastore.api.GetAllFunctionsResponse;
 import org.apache.hadoop.hive.metastore.api.GetOpenTxnsInfoResponse;
 import org.apache.hadoop.hive.metastore.api.GetRoleGrantsForPrincipalRequest;
@@ -38,28 +41,40 @@ import org.apache.hadoop.hive.metastore.api.GetRoleGrantsForPrincipalResponse;
 import org.apache.hadoop.hive.metastore.api.HeartbeatTxnRangeResponse;
 import org.apache.hadoop.hive.metastore.api.HiveObjectPrivilege;
 import org.apache.hadoop.hive.metastore.api.HiveObjectRef;
+import org.apache.hadoop.hive.metastore.api.ISchema;
+import org.apache.hadoop.hive.metastore.api.InvalidInputException;
 import org.apache.hadoop.hive.metastore.api.InvalidObjectException;
 import org.apache.hadoop.hive.metastore.api.InvalidOperationException;
 import org.apache.hadoop.hive.metastore.api.InvalidPartitionException;
 import org.apache.hadoop.hive.metastore.api.LockRequest;
 import org.apache.hadoop.hive.metastore.api.LockResponse;
+import org.apache.hadoop.hive.metastore.api.Materialization;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.MetadataPpdResult;
 import org.apache.hadoop.hive.metastore.api.NoSuchLockException;
 import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
 import org.apache.hadoop.hive.metastore.api.NoSuchTxnException;
+import org.apache.hadoop.hive.metastore.api.NotNullConstraintsRequest;
 import org.apache.hadoop.hive.metastore.api.NotificationEventResponse;
+import org.apache.hadoop.hive.metastore.api.NotificationEventsCountRequest;
+import org.apache.hadoop.hive.metastore.api.NotificationEventsCountResponse;
 import org.apache.hadoop.hive.metastore.api.OpenTxnsResponse;
 import org.apache.hadoop.hive.metastore.api.Order;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.metastore.api.PartitionEventType;
+import org.apache.hadoop.hive.metastore.api.PartitionValuesRequest;
+import org.apache.hadoop.hive.metastore.api.PartitionValuesResponse;
 import org.apache.hadoop.hive.metastore.api.PrimaryKeysRequest;
+import org.apache.hadoop.hive.metastore.api.PrivilegeBag;
+import org.apache.hadoop.hive.metastore.api.RuntimeStat;
 import org.apache.hadoop.hive.metastore.api.SQLCheckConstraint;
 import org.apache.hadoop.hive.metastore.api.SQLDefaultConstraint;
 import org.apache.hadoop.hive.metastore.api.SQLForeignKey;
 import org.apache.hadoop.hive.metastore.api.SQLNotNullConstraint;
 import org.apache.hadoop.hive.metastore.api.SQLPrimaryKey;
 import org.apache.hadoop.hive.metastore.api.SQLUniqueConstraint;
+import org.apache.hadoop.hive.metastore.api.SchemaVersion;
+import org.apache.hadoop.hive.metastore.api.SchemaVersionState;
 import org.apache.hadoop.hive.metastore.api.SerDeInfo;
 import org.apache.hadoop.hive.metastore.api.ShowCompactResponse;
 import org.apache.hadoop.hive.metastore.api.ShowLocksRequest;
@@ -67,14 +82,24 @@ import org.apache.hadoop.hive.metastore.api.ShowLocksResponse;
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.api.TableMeta;
+import org.apache.hadoop.hive.metastore.api.TableValidWriteIds;
 import org.apache.hadoop.hive.metastore.api.TxnAbortedException;
 import org.apache.hadoop.hive.metastore.api.TxnOpenException;
+import org.apache.hadoop.hive.metastore.api.TxnToWriteId;
+import org.apache.hadoop.hive.metastore.api.UniqueConstraintsRequest;
 import org.apache.hadoop.hive.metastore.api.UnknownDBException;
 import org.apache.hadoop.hive.metastore.api.UnknownPartitionException;
 import org.apache.hadoop.hive.metastore.api.UnknownTableException;
+import org.apache.hadoop.hive.metastore.api.WMFullResourcePlan;
+import org.apache.hadoop.hive.metastore.api.WMMapping;
+import org.apache.hadoop.hive.metastore.api.WMNullablePool;
+import org.apache.hadoop.hive.metastore.api.WMNullableResourcePlan;
+import org.apache.hadoop.hive.metastore.api.WMPool;
+import org.apache.hadoop.hive.metastore.api.WMResourcePlan;
+import org.apache.hadoop.hive.metastore.api.WMTrigger;
+import org.apache.hadoop.hive.metastore.api.WMValidateResourcePlanResponse;
 import org.apache.hadoop.hive.metastore.partition.spec.PartitionSpecProxy;
 import org.apache.hadoop.hive.metastore.utils.ObjectPair;
-import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
 
 import java.io.IOException;
@@ -82,16 +107,11 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Mock metastore client. It uses MockStore
@@ -127,6 +147,11 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public Database getDatabase(String catalogName, String databaseName) throws NoSuchObjectException, MetaException, TException {
+        return getDatabase(databaseName);
+    }
+
+    @Override
     public List<String> getDatabases(String pattern) throws MetaException, TException {
         Set<String> dbnames = new HashSet<>();
         for (MockStore.MockTable table: glueStore.getTables()) {
@@ -136,8 +161,18 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public List<String> getDatabases(String catalogName, String databaseName) throws MetaException, TException {
+        return getDatabases(databaseName);
+    }
+
+    @Override
     public List<String> getAllDatabases() throws MetaException, TException {
         return getDatabases(".*");
+    }
+
+    @Override
+    public List<String> getAllDatabases(String s) throws MetaException, TException {
+        return getAllDatabases();
     }
 
     @Override
@@ -149,6 +184,11 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
             }
         }
         return tablenames;
+    }
+
+    @Override
+    public List<String> getAllTables(String catName, String dbName) throws MetaException, TException, UnknownDBException {
+        return getAllTables(dbName);
     }
 
     @Override
@@ -168,6 +208,11 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
         }
 
         return getMockedHiveTable(dbName, tableName, selectedTable);
+    }
+
+    @Override
+    public Table getTable(String catName, String dbName, String tableName) throws MetaException, TException {
+        return getTable(dbName, tableName);
     }
 
     private Table getMockedHiveTable(String dbName, String tableName, MockStore.MockTable selectedTable) {
@@ -248,6 +293,10 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public void alterDatabase(String s, String s1, Database database) throws NoSuchObjectException, MetaException, TException {
+    }
+
+    @Override
     public void dropDatabase(String name) throws NoSuchObjectException, InvalidOperationException, MetaException,
             TException {
     }
@@ -260,6 +309,10 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     @Override
     public void dropDatabase(String name, boolean deleteData, boolean ignoreUnknownDb, boolean cascade)
             throws NoSuchObjectException, InvalidOperationException, MetaException, TException {
+    }
+
+    @Override
+    public void dropDatabase(String s, String s1, boolean b, boolean b1, boolean b2) throws NoSuchObjectException, InvalidOperationException, MetaException, TException {
     }
 
     @Override
@@ -298,6 +351,11 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
             MetaException, TException {
     }
 
+    @Override
+    public void alterFunction(String s, String s1, String s2, Function function) throws InvalidObjectException, MetaException, TException {
+
+    }
+
     public void alter_partition(
             String dbName,
             String tblName,
@@ -312,6 +370,11 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
             org.apache.hadoop.hive.metastore.api.Partition partition,
             EnvironmentContext environmentContext
     ) throws InvalidOperationException, MetaException, TException {
+    }
+
+    @Override
+    public void alter_partition(String s, String s1, String s2, Partition partition, EnvironmentContext environmentContext) throws InvalidOperationException, MetaException, TException {
+
     }
 
     public void alter_partitions(
@@ -331,8 +394,18 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public void alter_partitions(String s, String s1, String s2, List<Partition> list, EnvironmentContext environmentContext) throws InvalidOperationException, MetaException, TException {
+
+    }
+
+    @Override
     public void alter_table(String dbName, String tblName, org.apache.hadoop.hive.metastore.api.Table table)
             throws InvalidOperationException, MetaException, TException {
+    }
+
+    @Override
+    public void alter_table(String s, String s1, String s2, Table table, EnvironmentContext environmentContext) throws InvalidOperationException, MetaException, TException {
+
     }
 
     public void alter_table(String dbName, String tblName, org.apache.hadoop.hive.metastore.api.Table table, boolean cascade)
@@ -355,8 +428,18 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public Partition appendPartition(String s, String s1, String s2, List<String> list) throws InvalidObjectException, org.apache.hadoop.hive.metastore.api.AlreadyExistsException, MetaException, TException {
+        return null;
+    }
+
+    @Override
     public org.apache.hadoop.hive.metastore.api.Partition appendPartition(String dbName, String tblName, String partitionName) throws InvalidObjectException,
             org.apache.hadoop.hive.metastore.api.AlreadyExistsException, MetaException, TException {
+        return null;
+    }
+
+    @Override
+    public Partition appendPartition(String s, String s1, String s2, String s3) throws InvalidObjectException, org.apache.hadoop.hive.metastore.api.AlreadyExistsException, MetaException, TException {
         return null;
     }
 
@@ -478,7 +561,32 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public void replCommitTxn(long l, String s) throws NoSuchTxnException, TxnAbortedException, TException {
+
+    }
+
+    @Override
     public void abortTxns(List<Long> txnIds) throws TException {
+    }
+
+    @Override
+    public long allocateTableWriteId(long l, String s, String s1) throws TException {
+        return 0;
+    }
+
+    @Override
+    public void replTableWriteIdState(String s, String s1, String s2, List<String> list) throws TException {
+
+    }
+
+    @Override
+    public List<TxnToWriteId> allocateTableWriteIdsBatch(List<Long> list, String s, String s1) throws TException {
+        return null;
+    }
+
+    @Override
+    public List<TxnToWriteId> replAllocateTableWriteIdsBatch(String s, String s1, String s2, List<TxnToWriteId> list) throws TException {
+        return null;
     }
 
     @Deprecated
@@ -501,6 +609,11 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public CompactionResponse compact2(String s, String s1, String s2, CompactionType compactionType, Map<String, String> map) throws TException {
+        return null;
+    }
+
+    @Override
     public void createFunction(org.apache.hadoop.hive.metastore.api.Function function) throws InvalidObjectException, MetaException, TException {
     }
 
@@ -518,10 +631,20 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public boolean deletePartitionColumnStatistics(String s, String s1, String s2, String s3, String s4) throws NoSuchObjectException, MetaException, InvalidObjectException, TException, InvalidInputException {
+        return false;
+    }
+
+    @Override
     public boolean deleteTableColumnStatistics(
             String dbName, String tableName, String colName
     ) throws NoSuchObjectException, MetaException, InvalidObjectException,
             TException, org.apache.hadoop.hive.metastore.api.InvalidInputException {
+        return false;
+    }
+
+    @Override
+    public boolean deleteTableColumnStatistics(String s, String s1, String s2, String s3) throws NoSuchObjectException, MetaException, InvalidObjectException, TException, InvalidInputException {
         return false;
     }
 
@@ -531,8 +654,18 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public void dropFunction(String s, String s1, String s2) throws MetaException, NoSuchObjectException, InvalidObjectException, InvalidInputException, TException {
+
+    }
+
+    @Override
     public boolean dropPartition(String dbName, String tblName, List<String> values, boolean deleteData)
             throws NoSuchObjectException, MetaException, TException {
+        return false;
+    }
+
+    @Override
+    public boolean dropPartition(String s, String s1, String s2, List<String> list, boolean b) throws NoSuchObjectException, MetaException, TException {
         return false;
     }
 
@@ -542,9 +675,19 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public boolean dropPartition(String s, String s1, String s2, List<String> list, PartitionDropOptions partitionDropOptions) throws NoSuchObjectException, MetaException, TException {
+        return false;
+    }
+
+    @Override
     public boolean dropPartition(String dbName, String tblName, String partitionName, boolean deleteData)
             throws NoSuchObjectException, MetaException, TException {
         List<String> values = partitionNameToVals(partitionName);
+        return false;
+    }
+
+    @Override
+    public boolean dropPartition(String s, String s1, String s2, String s3, boolean b) throws NoSuchObjectException, MetaException, TException {
         return false;
     }
 
@@ -587,6 +730,11 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
         return Collections.emptyList();
     }
 
+    @Override
+    public List<Partition> dropPartitions(String s, String s1, String s2, List<ObjectPair<Integer, byte[]>> list, PartitionDropOptions partitionDropOptions) throws NoSuchObjectException, MetaException, TException {
+        return null;
+    }
+
     @Deprecated
     public void dropTable(String tableName, boolean deleteData) throws MetaException, UnknownTableException, TException,
             NoSuchObjectException {
@@ -594,6 +742,26 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
 
     @Override
     public void dropTable(String dbname, String tableName) throws MetaException, TException, NoSuchObjectException {
+    }
+
+    @Override
+    public void dropTable(String s, String s1, String s2, boolean b, boolean b1, boolean b2) throws MetaException, NoSuchObjectException, TException {
+
+    }
+
+    @Override
+    public void truncateTable(String s, String s1, List<String> list) throws MetaException, TException {
+
+    }
+
+    @Override
+    public void truncateTable(String s, String s1, String s2, List<String> list) throws MetaException, TException {
+
+    }
+
+    @Override
+    public CmRecycleResponse recycleDirToCmPath(CmRecycleRequest cmRecycleRequest) throws MetaException, TException {
+        return null;
     }
 
     @Override
@@ -618,6 +786,11 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public Partition exchange_partition(Map<String, String> map, String s, String s1, String s2, String s3, String s4, String s5) throws MetaException, NoSuchObjectException, InvalidObjectException, TException {
+        return null;
+    }
+
+    @Override
     public List<org.apache.hadoop.hive.metastore.api.Partition> exchange_partitions(
             Map<String, String> partitionSpecs,
             String sourceDb,
@@ -629,8 +802,18 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public List<Partition> exchange_partitions(Map<String, String> map, String s, String s1, String s2, String s3, String s4, String s5) throws MetaException, NoSuchObjectException, InvalidObjectException, TException {
+        return null;
+    }
+
+    @Override
     public AggrStats getAggrColStatsFor(String dbName, String tblName, List<String> colNames, List<String> partName)
             throws NoSuchObjectException, MetaException, TException {
+        return null;
+    }
+
+    @Override
+    public AggrStats getAggrColStatsFor(String s, String s1, String s2, List<String> list, List<String> list1) throws NoSuchObjectException, MetaException, TException {
         return null;
     }
 
@@ -657,13 +840,28 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public List<FieldSchema> getFields(String s, String s1, String s2) throws MetaException, TException, UnknownTableException, UnknownDBException {
+        return null;
+    }
+
+    @Override
     public org.apache.hadoop.hive.metastore.api.Function getFunction(String dbName, String functionName) throws MetaException, TException {
+        return null;
+    }
+
+    @Override
+    public Function getFunction(String s, String s1, String s2) throws MetaException, TException {
         return null;
     }
 
     @Override
     public List<String> getFunctions(String dbName, String pattern) throws MetaException, TException {
         return Collections.emptyList();
+    }
+
+    @Override
+    public List<String> getFunctions(String s, String s1, String s2) throws MetaException, TException {
+        return null;
     }
 
     @Override
@@ -681,14 +879,49 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public void createCatalog(Catalog catalog) throws org.apache.hadoop.hive.metastore.api.AlreadyExistsException, InvalidObjectException, MetaException, TException {
+
+    }
+
+    @Override
+    public void alterCatalog(String s, Catalog catalog) throws NoSuchObjectException, InvalidObjectException, MetaException, TException {
+
+    }
+
+    @Override
+    public Catalog getCatalog(String s) throws NoSuchObjectException, MetaException, TException {
+        return null;
+    }
+
+    @Override
+    public List<String> getCatalogs() throws MetaException, TException {
+        return null;
+    }
+
+    @Override
+    public void dropCatalog(String s) throws NoSuchObjectException, InvalidOperationException, MetaException, TException {
+
+    }
+
+    @Override
     public org.apache.hadoop.hive.metastore.api.Partition getPartition(String dbName, String tblName, List<String> values)
             throws NoSuchObjectException, MetaException, TException {
         return null;
     }
 
     @Override
+    public Partition getPartition(String s, String s1, String s2, List<String> list) throws NoSuchObjectException, MetaException, TException {
+        return null;
+    }
+
+    @Override
     public org.apache.hadoop.hive.metastore.api.Partition getPartition(String dbName, String tblName, String partitionName)
             throws MetaException, UnknownTableException, NoSuchObjectException, TException {
+        return null;
+    }
+
+    @Override
+    public Partition getPartition(String s, String s1, String s2, String s3) throws MetaException, UnknownTableException, NoSuchObjectException, TException {
         return null;
     }
 
@@ -703,10 +936,20 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public Map<String, List<ColumnStatisticsObj>> getPartitionColumnStatistics(String s, String s1, String s2, List<String> list, List<String> list1) throws NoSuchObjectException, MetaException, TException {
+        return null;
+    }
+
+    @Override
     public org.apache.hadoop.hive.metastore.api.Partition getPartitionWithAuthInfo(
             String databaseName, String tableName, List<String> values,
             String userName, List<String> groupNames)
             throws MetaException, UnknownTableException, NoSuchObjectException, TException {
+        return null;
+    }
+
+    @Override
+    public Partition getPartitionWithAuthInfo(String s, String s1, String s2, List<String> list, String s3, List<String> list1) throws MetaException, UnknownTableException, NoSuchObjectException, TException {
         return null;
     }
 
@@ -718,9 +961,19 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public List<Partition> getPartitionsByNames(String s, String s1, String s2, List<String> list) throws NoSuchObjectException, MetaException, TException {
+        return null;
+    }
+
+    @Override
     public List<FieldSchema> getSchema(String db, String tableName) throws MetaException, TException, UnknownTableException,
             UnknownDBException {
         return Collections.emptyList();
+    }
+
+    @Override
+    public List<FieldSchema> getSchema(String s, String s1, String s2) throws MetaException, TException, UnknownTableException, UnknownDBException {
+        return null;
     }
 
     @Deprecated
@@ -736,9 +989,34 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public List<ColumnStatisticsObj> getTableColumnStatistics(String s, String s1, String s2, List<String> list) throws NoSuchObjectException, MetaException, TException {
+        return null;
+    }
+
+    @Override
     public List<org.apache.hadoop.hive.metastore.api.Table> getTableObjectsByName(String dbName, List<String> tableNames) throws MetaException,
             InvalidOperationException, UnknownDBException, TException {
         return Collections.emptyList();
+    }
+
+    @Override
+    public List<Table> getTableObjectsByName(String s, String s1, List<String> list) throws MetaException, InvalidOperationException, UnknownDBException, TException {
+        return null;
+    }
+
+    @Override
+    public Materialization getMaterializationInvalidationInfo(CreationMetadata creationMetadata, String s) throws MetaException, InvalidOperationException, UnknownDBException, TException {
+        return null;
+    }
+
+    @Override
+    public void updateCreationMetadata(String s, String s1, CreationMetadata creationMetadata) throws MetaException, TException {
+
+    }
+
+    @Override
+    public void updateCreationMetadata(String s, String s1, String s2, CreationMetadata creationMetadata) throws MetaException, TException {
+
     }
 
     @Override
@@ -746,9 +1024,29 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
         return Collections.emptyList();
     }
 
+    @Override
+    public List<String> getTables(String s, String s1, String s2) throws MetaException, TException, UnknownDBException {
+        return null;
+    }
+
     public List<String> getTables(String dbname, String tablePattern, TableType tableType)
             throws MetaException, TException, UnknownDBException {
         return Collections.emptyList();
+    }
+
+    @Override
+    public List<String> getTables(String s, String s1, String s2, TableType tableType) throws MetaException, TException, UnknownDBException {
+        return null;
+    }
+
+    @Override
+    public List<String> getMaterializedViewsForRewriting(String s) throws MetaException, TException, UnknownDBException {
+        return null;
+    }
+
+    @Override
+    public List<String> getMaterializedViewsForRewriting(String s, String s1) throws MetaException, TException, UnknownDBException {
+        return null;
     }
 
     @Override
@@ -758,12 +1056,27 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public List<TableMeta> getTableMeta(String s, String s1, String s2, List<String> list) throws MetaException, TException, UnknownDBException {
+        return null;
+    }
+
+    @Override
     public ValidTxnList getValidTxns() throws TException {
         return null;
     }
 
     @Override
     public ValidTxnList getValidTxns(long currentTxn) throws TException {
+        return null;
+    }
+
+    @Override
+    public ValidWriteIdList getValidWriteIds(String s) throws TException {
+        return null;
+    }
+
+    @Override
+    public List<TableValidWriteIds> getValidWriteIds(List<String> list, String s) throws TException {
         return null;
     }
 
@@ -786,6 +1099,11 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
             org.apache.hadoop.hive.metastore.api.PrivilegeBag privileges,
             boolean grantOption
     ) throws MetaException, TException {
+        return false;
+    }
+
+    @Override
+    public boolean refresh_privileges(HiveObjectRef hiveObjectRef, String s, PrivilegeBag privilegeBag) throws MetaException, TException {
         return false;
     }
 
@@ -821,9 +1139,19 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public boolean isPartitionMarkedForEvent(String s, String s1, String s2, Map<String, String> map, PartitionEventType partitionEventType) throws MetaException, NoSuchObjectException, TException, UnknownTableException, UnknownDBException, UnknownPartitionException, InvalidPartitionException {
+        return false;
+    }
+
+    @Override
     public List<String> listPartitionNames(String dbName, String tblName, short max)
             throws MetaException, TException {
         return Collections.emptyList();
+    }
+
+    @Override
+    public List<String> listPartitionNames(String s, String s1, String s2, int i) throws NoSuchObjectException, MetaException, TException {
+        return null;
     }
 
     @Override
@@ -834,13 +1162,33 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public List<String> listPartitionNames(String s, String s1, String s2, List<String> list, int i) throws MetaException, TException, NoSuchObjectException {
+        return null;
+    }
+
+    @Override
+    public PartitionValuesResponse listPartitionValues(PartitionValuesRequest partitionValuesRequest) throws MetaException, TException, NoSuchObjectException {
+        return null;
+    }
+
+    @Override
     public int getNumPartitionsByFilter(String dbName, String tableName, String filter)
             throws MetaException, NoSuchObjectException, TException {
         return 0;
     }
 
     @Override
+    public int getNumPartitionsByFilter(String s, String s1, String s2, String s3) throws MetaException, NoSuchObjectException, TException {
+        return 0;
+    }
+
+    @Override
     public PartitionSpecProxy listPartitionSpecs(String dbName, String tblName, int max) throws TException {
+        return null;
+    }
+
+    @Override
+    public PartitionSpecProxy listPartitionSpecs(String s, String s1, String s2, int i) throws TException {
         return null;
     }
 
@@ -851,9 +1199,19 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public PartitionSpecProxy listPartitionSpecsByFilter(String s, String s1, String s2, String s3, int i) throws MetaException, NoSuchObjectException, TException {
+        return null;
+    }
+
+    @Override
     public List<org.apache.hadoop.hive.metastore.api.Partition> listPartitions(String dbName, String tblName, short max)
             throws NoSuchObjectException, MetaException, TException {
         return Collections.emptyList();
+    }
+
+    @Override
+    public List<Partition> listPartitions(String s, String s1, String s2, int i) throws NoSuchObjectException, MetaException, TException {
+        return null;
     }
 
     @Override
@@ -864,6 +1222,11 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
             short max
     ) throws NoSuchObjectException, MetaException, TException {
         return Collections.emptyList();
+    }
+
+    @Override
+    public List<Partition> listPartitions(String s, String s1, String s2, List<String> list, int i) throws NoSuchObjectException, MetaException, TException {
+        return null;
     }
 
     @Override
@@ -879,6 +1242,11 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public boolean listPartitionsByExpr(String s, String s1, String s2, byte[] bytes, String s3, int i, List<Partition> list) throws TException {
+        return false;
+    }
+
+    @Override
     public List<org.apache.hadoop.hive.metastore.api.Partition> listPartitionsByFilter(
             String databaseName,
             String tableName,
@@ -889,10 +1257,20 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public List<Partition> listPartitionsByFilter(String s, String s1, String s2, String s3, int i) throws MetaException, NoSuchObjectException, TException {
+        return null;
+    }
+
+    @Override
     public List<org.apache.hadoop.hive.metastore.api.Partition> listPartitionsWithAuthInfo(String database, String table, short maxParts,
                                                                                            String user, List<String> groups)
             throws MetaException, TException, NoSuchObjectException {
         return Collections.emptyList();
+    }
+
+    @Override
+    public List<Partition> listPartitionsWithAuthInfo(String s, String s1, String s2, int i, String s3, List<String> list) throws MetaException, TException, NoSuchObjectException {
+        return null;
     }
 
     @Override
@@ -903,9 +1281,19 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public List<Partition> listPartitionsWithAuthInfo(String s, String s1, String s2, List<String> list, int i, String s3, List<String> list1) throws MetaException, TException, NoSuchObjectException {
+        return null;
+    }
+
+    @Override
     public List<String> listTableNamesByFilter(String dbName, String filter, short maxTables) throws MetaException,
             TException, InvalidOperationException, UnknownDBException {
         return Collections.emptyList();
+    }
+
+    @Override
+    public List<String> listTableNamesByFilter(String s, String s1, String s2, int i) throws TException, InvalidOperationException, UnknownDBException {
+        return null;
     }
 
     @Override
@@ -933,8 +1321,18 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public void markPartitionForEvent(String s, String s1, String s2, Map<String, String> map, PartitionEventType partitionEventType) throws MetaException, NoSuchObjectException, TException, UnknownTableException, UnknownDBException, UnknownPartitionException, InvalidPartitionException {
+
+    }
+
+    @Override
     public long openTxn(String user) throws TException {
         return 0;
+    }
+
+    @Override
+    public List<Long> replOpenTxn(String s, List<Long> list, String s1) throws TException {
+        return null;
     }
 
     @Override
@@ -963,12 +1361,22 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public void renamePartition(String s, String s1, String s2, List<String> list, Partition partition) throws InvalidOperationException, MetaException, TException {
+
+    }
+
+    @Override
     public long renewDelegationToken(String tokenStrForm) throws MetaException, TException {
         return 0;
     }
 
     @Override
     public void rollbackTxn(long txnId) throws NoSuchTxnException, TException {
+    }
+
+    @Override
+    public void replRollbackTxn(long l, String s) throws NoSuchTxnException, TException {
+
     }
 
     @Override
@@ -1040,6 +1448,26 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public List<SQLUniqueConstraint> getUniqueConstraints(UniqueConstraintsRequest uniqueConstraintsRequest) throws MetaException, NoSuchObjectException, TException {
+        return null;
+    }
+
+    @Override
+    public List<SQLNotNullConstraint> getNotNullConstraints(NotNullConstraintsRequest notNullConstraintsRequest) throws MetaException, NoSuchObjectException, TException {
+        return null;
+    }
+
+    @Override
+    public List<SQLDefaultConstraint> getDefaultConstraints(DefaultConstraintsRequest defaultConstraintsRequest) throws MetaException, NoSuchObjectException, TException {
+        return null;
+    }
+
+    @Override
+    public List<SQLCheckConstraint> getCheckConstraints(CheckConstraintsRequest checkConstraintsRequest) throws MetaException, NoSuchObjectException, TException {
+        return null;
+    }
+
+    @Override
     public void createTableWithConstraints(
             org.apache.hadoop.hive.metastore.api.Table table,
             List<SQLPrimaryKey> primaryKeys,
@@ -1060,6 +1488,11 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public void dropConstraint(String s, String s1, String s2, String s3) throws MetaException, NoSuchObjectException, TException {
+
+    }
+
+    @Override
     public void addPrimaryKey(List<SQLPrimaryKey> primaryKeyCols)
             throws MetaException, NoSuchObjectException, TException {
     }
@@ -1067,6 +1500,206 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     @Override
     public void addForeignKey(List<SQLForeignKey> foreignKeyCols)
             throws MetaException, NoSuchObjectException, TException {
+    }
+
+    @Override
+    public void addUniqueConstraint(List<SQLUniqueConstraint> list) throws MetaException, NoSuchObjectException, TException {
+
+    }
+
+    @Override
+    public void addNotNullConstraint(List<SQLNotNullConstraint> list) throws MetaException, NoSuchObjectException, TException {
+
+    }
+
+    @Override
+    public void addDefaultConstraint(List<SQLDefaultConstraint> list) throws MetaException, NoSuchObjectException, TException {
+
+    }
+
+    @Override
+    public void addCheckConstraint(List<SQLCheckConstraint> list) throws MetaException, NoSuchObjectException, TException {
+
+    }
+
+    @Override
+    public String getMetastoreDbUuid() throws MetaException, TException {
+        return null;
+    }
+
+    @Override
+    public void createResourcePlan(WMResourcePlan wmResourcePlan, String s) throws InvalidObjectException, MetaException, TException {
+
+    }
+
+    @Override
+    public WMFullResourcePlan getResourcePlan(String s) throws NoSuchObjectException, MetaException, TException {
+        return null;
+    }
+
+    @Override
+    public List<WMResourcePlan> getAllResourcePlans() throws NoSuchObjectException, MetaException, TException {
+        return null;
+    }
+
+    @Override
+    public void dropResourcePlan(String s) throws NoSuchObjectException, MetaException, TException {
+
+    }
+
+    @Override
+    public WMFullResourcePlan alterResourcePlan(String s, WMNullableResourcePlan wmNullableResourcePlan, boolean b, boolean b1, boolean b2) throws NoSuchObjectException, InvalidObjectException, MetaException, TException {
+        return null;
+    }
+
+    @Override
+    public WMFullResourcePlan getActiveResourcePlan() throws MetaException, TException {
+        return null;
+    }
+
+    @Override
+    public WMValidateResourcePlanResponse validateResourcePlan(String s) throws NoSuchObjectException, InvalidObjectException, MetaException, TException {
+        return null;
+    }
+
+    @Override
+    public void createWMTrigger(WMTrigger wmTrigger) throws InvalidObjectException, MetaException, TException {
+
+    }
+
+    @Override
+    public void alterWMTrigger(WMTrigger wmTrigger) throws NoSuchObjectException, InvalidObjectException, MetaException, TException {
+
+    }
+
+    @Override
+    public void dropWMTrigger(String s, String s1) throws NoSuchObjectException, MetaException, TException {
+
+    }
+
+    @Override
+    public List<WMTrigger> getTriggersForResourcePlan(String s) throws NoSuchObjectException, MetaException, TException {
+        return null;
+    }
+
+    @Override
+    public void createWMPool(WMPool wmPool) throws NoSuchObjectException, InvalidObjectException, MetaException, TException {
+
+    }
+
+    @Override
+    public void alterWMPool(WMNullablePool wmNullablePool, String s) throws NoSuchObjectException, InvalidObjectException, TException {
+
+    }
+
+    @Override
+    public void dropWMPool(String s, String s1) throws TException {
+
+    }
+
+    @Override
+    public void createOrUpdateWMMapping(WMMapping wmMapping, boolean b) throws TException {
+
+    }
+
+    @Override
+    public void dropWMMapping(WMMapping wmMapping) throws TException {
+
+    }
+
+    @Override
+    public void createOrDropTriggerToPoolMapping(String s, String s1, String s2, boolean b) throws org.apache.hadoop.hive.metastore.api.AlreadyExistsException, NoSuchObjectException, InvalidObjectException, MetaException, TException {
+
+    }
+
+    @Override
+    public void createISchema(ISchema iSchema) throws TException {
+
+    }
+
+    @Override
+    public void alterISchema(String s, String s1, String s2, ISchema iSchema) throws TException {
+
+    }
+
+    @Override
+    public ISchema getISchema(String s, String s1, String s2) throws TException {
+        return null;
+    }
+
+    @Override
+    public void dropISchema(String s, String s1, String s2) throws TException {
+
+    }
+
+    @Override
+    public void addSchemaVersion(SchemaVersion schemaVersion) throws TException {
+
+    }
+
+    @Override
+    public SchemaVersion getSchemaVersion(String s, String s1, String s2, int i) throws TException {
+        return null;
+    }
+
+    @Override
+    public SchemaVersion getSchemaLatestVersion(String s, String s1, String s2) throws TException {
+        return null;
+    }
+
+    @Override
+    public List<SchemaVersion> getSchemaAllVersions(String s, String s1, String s2) throws TException {
+        return null;
+    }
+
+    @Override
+    public void dropSchemaVersion(String s, String s1, String s2, int i) throws TException {
+
+    }
+
+    @Override
+    public FindSchemasByColsResp getSchemaByCols(FindSchemasByColsRqst findSchemasByColsRqst) throws TException {
+        return null;
+    }
+
+    @Override
+    public void mapSchemaVersionToSerde(String s, String s1, String s2, int i, String s3) throws TException {
+
+    }
+
+    @Override
+    public void setSchemaVersionState(String s, String s1, String s2, int i, SchemaVersionState schemaVersionState) throws TException {
+
+    }
+
+    @Override
+    public void addSerDe(SerDeInfo serDeInfo) throws TException {
+
+    }
+
+    @Override
+    public SerDeInfo getSerDe(String s) throws TException {
+        return null;
+    }
+
+    @Override
+    public LockResponse lockMaterializationRebuild(String s, String s1, long l) throws TException {
+        return null;
+    }
+
+    @Override
+    public boolean heartbeatLockMaterializationRebuild(String s, String s1, long l) throws TException {
+        return false;
+    }
+
+    @Override
+    public void addRuntimeStat(RuntimeStat runtimeStat) throws TException {
+
+    }
+
+    @Override
+    public List<RuntimeStat> getRuntimeStats(int i, int i1) throws TException {
+        return null;
     }
 
     @Override
@@ -1110,6 +1743,11 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     }
 
     @Override
+    public NotificationEventsCountResponse getNotificationEventsCount(NotificationEventsCountRequest notificationEventsCountRequest) throws TException {
+        return null;
+    }
+
+    @Override
     public FireEventResponse fireListenerEvent(FireEventRequest fireEventRequest) throws TException {
         return null;
     }
@@ -1138,6 +1776,11 @@ public class MockAWSCatalogMetastoreClient implements IMetaStoreClient {
     @Override
     public boolean tableExists(String databaseName, String tableName) throws MetaException, TException,
             UnknownDBException {
+        return false;
+    }
+
+    @Override
+    public boolean tableExists(String s, String s1, String s2) throws MetaException, TException, UnknownDBException {
         return false;
     }
 
