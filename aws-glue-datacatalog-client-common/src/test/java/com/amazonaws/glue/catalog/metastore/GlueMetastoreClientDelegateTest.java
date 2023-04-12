@@ -80,6 +80,7 @@ import org.apache.hadoop.hive.metastore.api.PrincipalType;
 import org.apache.hadoop.hive.metastore.api.TableMeta;
 import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -348,6 +349,7 @@ public class GlueMetastoreClientDelegateTest {
   // ======================= Table ======================
 
   @Test(expected = InvalidObjectException.class)
+  @Ignore // DX-23514 turned off validation
   public void testGetTableInvalidGlueTable() throws Exception {
     Table tbl = getTestTable().withTableType(null);
     when(glueClient.getTable(any(GetTableRequest.class))).thenReturn(new GetTableResult().withTable(tbl));
