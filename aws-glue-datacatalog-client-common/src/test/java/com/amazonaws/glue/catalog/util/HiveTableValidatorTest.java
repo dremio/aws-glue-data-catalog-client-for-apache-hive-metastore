@@ -2,6 +2,7 @@ package com.amazonaws.glue.catalog.util;
 
 import com.amazonaws.services.glue.model.InvalidInputException;
 import com.amazonaws.services.glue.model.Table;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -18,6 +19,7 @@ public class HiveTableValidatorTest {
   private static final String EXPECTED_MESSAGE = "%s cannot be null";
 
   @Test
+  @Ignore // DX-23514 turned off validation
   public void testRequiredProperty_TableType() {
     thrown.expect(InvalidInputException.class);
     thrown.expectMessage(String.format(EXPECTED_MESSAGE, "TableType"));
@@ -26,6 +28,7 @@ public class HiveTableValidatorTest {
   }
 
   @Test
+  @Ignore // DX-23514 turned off validation
   public void testRequiredProperty_StorageDescriptor() {
     thrown.expect(InvalidInputException.class);
     thrown.expectMessage(String.format(EXPECTED_MESSAGE, "StorageDescriptor"));
@@ -34,6 +37,7 @@ public class HiveTableValidatorTest {
   }
 
   @Test
+  @Ignore // DX-23514 turned off validation
   public void testRequiredProperty_InputFormat() {
     thrown.expect(InvalidInputException.class);
     thrown.expectMessage(String.format(EXPECTED_MESSAGE, "StorageDescriptor#InputFormat"));
@@ -43,6 +47,7 @@ public class HiveTableValidatorTest {
   }
 
   @Test
+  @Ignore // DX-23514 turned off validation
   public void testRequiredProperty_OutputFormat() {
     thrown.expect(InvalidInputException.class);
     thrown.expectMessage(String.format(EXPECTED_MESSAGE, "StorageDescriptor#OutputFormat"));
@@ -52,6 +57,7 @@ public class HiveTableValidatorTest {
   }
 
   @Test
+  @Ignore // DX-23514 turned off validation
   public void testRequiredProperty_SerdeInfo() {
     thrown.expect(InvalidInputException.class);
     thrown.expectMessage(String.format(EXPECTED_MESSAGE, "StorageDescriptor#SerdeInfo"));
@@ -61,6 +67,7 @@ public class HiveTableValidatorTest {
   }
 
   @Test
+  @Ignore // DX-23514 turned off validation
   public void testRequiredProperty_SerializationLibrary() {
     thrown.expect(InvalidInputException.class);
     thrown.expectMessage(String.format(EXPECTED_MESSAGE, "StorageDescriptor#SerdeInfo#SerializationLibrary"));
@@ -70,11 +77,13 @@ public class HiveTableValidatorTest {
   }
 
   @Test
+  @Ignore // DX-23514 turned off validation
   public void testRequiredProperty_ValidTable() {
     REQUIRED_PROPERTIES_VALIDATOR.validate(getTestTable());
   }
 
   @Test
+  @Ignore // DX-23514 turned off validation
   public void testValidate_ViewTableType() {
     Table tbl = getTestTable();
     tbl.setTableType(TableType.VIRTUAL_VIEW.name());
@@ -83,6 +92,7 @@ public class HiveTableValidatorTest {
   }
 
   @Test
+  @Ignore // DX-23514 turned off validation
   public void testValidate_ExcludeStorageHandlerType() {
     Table tbl = getTestTable();
     tbl.getParameters().put(META_TABLE_STORAGE, "org.apache.hadoop.hive.dynamodb.DynamoDBStorageHandler");
