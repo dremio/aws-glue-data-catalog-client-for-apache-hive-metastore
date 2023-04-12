@@ -1,6 +1,8 @@
 package com.amazonaws.glue.catalog.util;
 
+import com.amazonaws.glue.catalog.converters.BaseCatalogToHiveConverter;
 import com.amazonaws.glue.catalog.converters.CatalogToHiveConverter;
+import com.amazonaws.glue.catalog.converters.CatalogToHiveConverterFactory;
 import com.amazonaws.glue.catalog.converters.GlueInputConverter;
 import com.amazonaws.services.glue.model.BatchCreatePartitionRequest;
 import com.amazonaws.services.glue.model.BatchCreatePartitionResult;
@@ -12,7 +14,6 @@ import com.amazonaws.services.glue.model.PartitionError;
 import com.amazonaws.services.glue.AWSGlue;
 import com.google.common.collect.Lists;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
 import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
@@ -36,6 +37,7 @@ public final class BatchCreatePartitionsHelper {
   private List<Partition> partitionsFailed;
   private TException firstTException;
   private String catalogId;
+  private CatalogToHiveConverter catalogToHiveConverter;
 
   public BatchCreatePartitionsHelper(AWSGlue client, String databaseName, String tableName, String catalogId,
                                      List<Partition> partitions, boolean ifNotExists) {
@@ -45,6 +47,7 @@ public final class BatchCreatePartitionsHelper {
     this.catalogId = catalogId;
     this.partitions = partitions;
     this.ifNotExists = ifNotExists;
+    catalogToHiveConverter = CatalogToHiveConverterFactory.getCatalogToHiveConverter();
   }
 
   public BatchCreatePartitionsHelper createPartitions() {
@@ -62,7 +65,7 @@ public final class BatchCreatePartitionsHelper {
       processResult(result);
     } catch (Exception e) {
       logger.error("Exception thrown while creating partitions in DataCatalog: ", e);
-      firstTException = CatalogToHiveConverter.wrapInHiveException(e);
+      firstTException = catalogToHiveConverter.wrapInHiveException(e);
       if (isInvalidUserInputException(e)) {
         setAllFailed();
       } else {
@@ -89,7 +92,7 @@ public final class BatchCreatePartitionsHelper {
     for (PartitionError partitionError : partitionErrors) {
       Partition partitionFailed = partitionMap.remove(new PartitionKey(partitionError.getPartitionValues()));
 
-      TException exception = CatalogToHiveConverter.errorDetailToHiveException(partitionError.getErrorDetail());
+      TException exception = catalogToHiveConverter.errorDetailToHiveException(partitionError.getErrorDetail());
       if (ifNotExists && exception instanceof AlreadyExistsException) {
         // AlreadyExistsException is allowed, so we shouldn't add the partition to partitionsFailed list
         continue;
