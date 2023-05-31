@@ -34,6 +34,24 @@
       "parentUuid": "912f00d4_2b3ccaa6",
       "revId": "c9c0fdda0eada1d7d8befadaf9515f9e8848a0f7",
       "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f4767b9d_3b3a0e31",
+        "filename": "aws-glue-datacatalog-client-common/src/test/java/com/amazonaws/glue/catalog/util/HiveTableValidatorTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1000715
+      },
+      "writtenOn": "2023-05-31T19:19:48Z",
+      "side": 1,
+      "message": "Discussed offline with Dmitry - agreed to remove unused test cases",
+      "parentUuid": "71418b4f_d4c10570",
+      "revId": "c9c0fdda0eada1d7d8befadaf9515f9e8848a0f7",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
     }
   ]
 }
