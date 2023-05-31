@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f69965d2_f4558590",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000675
+      },
+      "writtenOn": "2023-05-31T19:09:10Z",
+      "side": 1,
+      "message": "One small comment. Test case looks good.",
+      "revId": "1a8ad2dd8d7fc031d8535b70ecb76d8094343bb1",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e557916_00831a47",
+        "filename": "aws-glue-datacatalog-client-common/src/main/java/com/amazonaws/glue/catalog/metastore/GlueMetastoreClientDelegate.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 925,
+      "author": {
+        "id": 1000675
+      },
+      "writtenOn": "2023-05-31T19:09:10Z",
+      "side": 1,
+      "message": "I assume the difference between the original here--GLUE_METASTORE_DELEGATE_THREAD_POOL vs this.executorService--is expected. If so, please resolve the comment.",
+      "revId": "1a8ad2dd8d7fc031d8535b70ecb76d8094343bb1",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    }
+  ]
+}
