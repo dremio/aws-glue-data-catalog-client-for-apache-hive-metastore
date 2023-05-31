@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8ace2b6_fe0f3d39",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000675
+      },
+      "writtenOn": "2023-05-31T18:52:01Z",
+      "side": 1,
+      "message": "I noticed some differences in the MockAWSCatalogMetastoreClient.java when looking at the original change in the dremio branch.\n\nWe drop the import org.apache.hadoop.hive.metastore.api.Index line and related methods here.\n\nYou have public List\u003cPartition\u003e dropPartitions commented out. If it is not needed, can it be deleted?\n\ncreateTableWithConstraints has new inputs.\n\nBoth addDynamicPartitions methods have a new input writeId.\n\nAre all of these things expected? If so, feel free to resolve this comment and I will +2 later.",
+      "revId": "c8c3d3bedbd37f1b3e991e46fa43b9d7cae5ee0a",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    }
+  ]
+}
