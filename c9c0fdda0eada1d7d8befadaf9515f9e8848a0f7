@@ -16,6 +16,24 @@
       "message": "Not quite sure what is comment suppose to convey.\n\nThese tests are no longer valid, correct? If yes - why not delete then? Or remove @Test annotation. Or change test to match existing behavior?",
       "revId": "c9c0fdda0eada1d7d8befadaf9515f9e8848a0f7",
       "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71418b4f_d4c10570",
+        "filename": "aws-glue-datacatalog-client-common/src/test/java/com/amazonaws/glue/catalog/util/HiveTableValidatorTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1000715
+      },
+      "writtenOn": "2023-05-31T16:56:34Z",
+      "side": 1,
+      "message": "There\u0027s no point of running these tests, so I could just remove the whole class. I guess I thought putting the @Ignore annotation with a comment helps with understanding this faster..\nI can either elaborate more in the comment line or remove the whole class as well (I think removing @Test annotation will just confuse future readers as to why this test is not executed.. so I\u0027d refrain from doing that option)\nI\u0027d go with a more detailed comment line but I don\u0027t have a strong opinion, let me know what you think.",
+      "parentUuid": "912f00d4_2b3ccaa6",
+      "revId": "c9c0fdda0eada1d7d8befadaf9515f9e8848a0f7",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
     }
   ]
 }
