@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ae81fe1_843bb2d1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000675
+      },
+      "writtenOn": "2023-05-31T19:03:44Z",
+      "side": 1,
+      "message": "Couple open comments",
+      "revId": "08c8e11150bbe93aff332a70338b820bee518d9a",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74f688f8_2f246263",
+        "filename": "aws-glue-datacatalog-client-common/src/main/java/com/amazonaws/glue/catalog/converters/BaseCatalogToHiveConverter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1000675
+      },
+      "writtenOn": "2023-05-31T19:03:44Z",
+      "side": 1,
+      "message": "Forgive me ignorance, but do we needs the imports here?\n\nimport org.apache.hadoop.mapred.FileInputFormat;\nimport org.apache.hadoop.mapred.FileOutputFormat;\n\nOr does setting the format inherently do the imports for us in convertEmptyStorageDescriptor?",
+      "revId": "08c8e11150bbe93aff332a70338b820bee518d9a",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91aaaf48_8a4252e5",
+        "filename": "aws-glue-datacatalog-client-common/src/main/java/com/amazonaws/glue/catalog/converters/BaseCatalogToHiveConverter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1000675
+      },
+      "writtenOn": "2023-05-31T19:03:44Z",
+      "side": 1,
+      "message": "Missing static from original change?",
+      "revId": "08c8e11150bbe93aff332a70338b820bee518d9a",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    }
+  ]
+}
