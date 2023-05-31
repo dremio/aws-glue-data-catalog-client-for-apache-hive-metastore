@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a9608a5_3cb3e0b6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000482
+      },
+      "writtenOn": "2023-05-31T19:26:11Z",
+      "side": 1,
+      "message": "Removing test classes would be the best but I\u0027m ok with this.",
+      "revId": "94cf353f646937c47ea75311cecc79cbe06809d6",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    }
+  ]
+}
