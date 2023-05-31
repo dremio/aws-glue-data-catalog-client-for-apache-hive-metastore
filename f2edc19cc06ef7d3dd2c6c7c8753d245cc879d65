@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f9e2e761_2b6e47fc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000675
+      },
+      "writtenOn": "2023-05-31T19:15:29Z",
+      "side": 1,
+      "message": "Could use somebody else with more context here to comb through AWSGlueDecoratorBase.java. Everything else seems sensible from cherry-pick dmitry\u0027s change.",
+      "revId": "f2edc19cc06ef7d3dd2c6c7c8753d245cc879d65",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    }
+  ]
+}
