@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "912f00d4_2b3ccaa6",
+        "filename": "aws-glue-datacatalog-client-common/src/test/java/com/amazonaws/glue/catalog/util/HiveTableValidatorTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1000482
+      },
+      "writtenOn": "2023-05-31T15:52:24Z",
+      "side": 1,
+      "message": "Not quite sure what is comment suppose to convey.\n\nThese tests are no longer valid, correct? If yes - why not delete then? Or remove @Test annotation. Or change test to match existing behavior?",
+      "revId": "c9c0fdda0eada1d7d8befadaf9515f9e8848a0f7",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    }
+  ]
+}
