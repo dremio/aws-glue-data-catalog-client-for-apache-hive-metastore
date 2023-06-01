@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e3c7129_7e699ee4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000675
+      },
+      "writtenOn": "2023-06-01T18:46:15Z",
+      "side": 1,
+      "message": "Changing to +2 after chatting with Adam. Change is due to needed more methods in the decorator pattern for Hive3",
+      "revId": "efb94a75f59273270321b7a9a9555059819947fe",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    }
+  ]
+}
