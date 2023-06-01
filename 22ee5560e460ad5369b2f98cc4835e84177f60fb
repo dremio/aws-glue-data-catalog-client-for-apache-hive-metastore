@@ -16,6 +16,24 @@
       "message": "Can you add some more detail to this commit message? A DX and a more complete explanation of what the testing is doing would be helpful. ",
       "revId": "22ee5560e460ad5369b2f98cc4835e84177f60fb",
       "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "382a33ee_fb361d11",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000715
+      },
+      "writtenOn": "2023-06-01T17:30:03Z",
+      "side": 1,
+      "message": "This is my bad, I should\u0027ve squashed this one to the commit below (Mock glue client to write unit tests). This one will disappear.",
+      "parentUuid": "633c957b_dd2e4525",
+      "revId": "22ee5560e460ad5369b2f98cc4835e84177f60fb",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
     }
   ]
 }
