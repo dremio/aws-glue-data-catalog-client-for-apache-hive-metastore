@@ -35,6 +35,24 @@
       "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f325468f_a25dbea9",
+        "filename": "aws-glue-datacatalog-client-common/src/main/java/com/amazonaws/glue/catalog/converters/BaseCatalogToHiveConverter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1000715
+      },
+      "writtenOn": "2023-06-01T10:54:26Z",
+      "side": 1,
+      "message": "Looks like we need to adjust the dependencies as these classes got relocated to another maven module, fixing.",
+      "parentUuid": "74f688f8_2f246263",
+      "revId": "08c8e11150bbe93aff332a70338b820bee518d9a",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "91aaaf48_8a4252e5",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-05-31T19:03:44Z",
       "side": 1,
       "message": "Missing static from original change?",
+      "revId": "08c8e11150bbe93aff332a70338b820bee518d9a",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d21ad039_eb5ef43f",
+        "filename": "aws-glue-datacatalog-client-common/src/main/java/com/amazonaws/glue/catalog/converters/BaseCatalogToHiveConverter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1000715
+      },
+      "writtenOn": "2023-06-01T10:54:26Z",
+      "side": 1,
+      "message": "After the Hive3 support commit some other methods become non-static such as convertFieldSchema and thus we need the static context. I found this should follow the upstream commit flow.",
+      "parentUuid": "91aaaf48_8a4252e5",
       "revId": "08c8e11150bbe93aff332a70338b820bee518d9a",
       "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
     }
