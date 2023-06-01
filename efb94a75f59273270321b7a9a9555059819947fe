@@ -33,6 +33,24 @@
       "message": "1.12.400 is from Feb 04, 2023\nAny reason not to go with most recent? Or are we matching what\u0027s in dremio\u0027s oss/pom.xml?",
       "revId": "efb94a75f59273270321b7a9a9555059819947fe",
       "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e94d6a82_7d66b2c9",
+        "filename": "pom.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1000715
+      },
+      "writtenOn": "2023-06-01T20:02:44Z",
+      "side": 1,
+      "message": "Yeah, matching your original -and actually fairly recent- change. I think upgrading the whole stuff to Hive 3 is enough for one round :)",
+      "parentUuid": "41a6fbe4_d74bde93",
+      "revId": "efb94a75f59273270321b7a9a9555059819947fe",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
     }
   ]
 }
