@@ -35,6 +35,24 @@
       "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ded8ffe_a0872bd7",
+        "filename": "aws-glue-datacatalog-client-common/src/main/java/com/amazonaws/glue/catalog/converters/BaseCatalogToHiveConverter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1000715
+      },
+      "writtenOn": "2023-06-01T10:54:09Z",
+      "side": 1,
+      "message": "Well this doesn\u0027t depend on any field variable and serves kinda utility purpose, so I guess having this as static makes sense.",
+      "parentUuid": "8a6d38a2_043f0317",
+      "revId": "87691707548508122b877c0876685a9a69209dde",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6429fa58_e5a7db4b",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-05-31T18:59:57Z",
       "side": 1,
       "message": "Is BaseCatalogToHiveConverter vs CatalogToHiveConverter in the original change expected?",
+      "revId": "87691707548508122b877c0876685a9a69209dde",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7155ac50_155b762a",
+        "filename": "aws-glue-datacatalog-client-common/src/test/java/com/amazonaws/glue/catalog/converters/EntityConversionTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1000715
+      },
+      "writtenOn": "2023-06-01T10:54:09Z",
+      "side": 1,
+      "message": "Yes, https://github.com/awslabs/aws-glue-data-catalog-client-for-apache-hive-metastore/commit/5e1546bfa68835cd5a642a9d78ecf39f79554802#diff-8e1414f6ce52ee3905710e645d808b999017082ffd8cdb2d4be5975514603573 renamed the class.",
+      "parentUuid": "6429fa58_e5a7db4b",
       "revId": "87691707548508122b877c0876685a9a69209dde",
       "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
     }
