@@ -33,6 +33,24 @@
       "message": "I assume the difference between the original here--GLUE_METASTORE_DELEGATE_THREAD_POOL vs this.executorService--is expected. If so, please resolve the comment.",
       "revId": "1a8ad2dd8d7fc031d8535b70ecb76d8094343bb1",
       "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99dc58c9_a4569524",
+        "filename": "aws-glue-datacatalog-client-common/src/main/java/com/amazonaws/glue/catalog/metastore/GlueMetastoreClientDelegate.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 925,
+      "author": {
+        "id": 1000715
+      },
+      "writtenOn": "2023-06-01T10:54:35Z",
+      "side": 1,
+      "message": "Yes, introduced by the Hive3 support change as well:\nhttps://github.com/awslabs/aws-glue-data-catalog-client-for-apache-hive-metastore/commit/5e1546bfa68835cd5a642a9d78ecf39f79554802#diff-acf4c05c48cb996d6da5cfea4ae7ad3dce5e13ab747b1e7eb22894f91ad0609bR182",
+      "parentUuid": "1e557916_00831a47",
+      "revId": "1a8ad2dd8d7fc031d8535b70ecb76d8094343bb1",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
     }
   ]
 }
