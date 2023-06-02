@@ -1,0 +1,7 @@
+Code-Review+2: Dan Huff <dan.huff@dremio.com>
+Verified+1: Dmitry Chirkov <dmitry.chirkov@dremio.com>
+Submitted-by: Adam Szita <adam.szita@dremio.com>
+Submitted-at: Fri, 02 Jun 2023 07:48:20 +0000
+Reviewed-on: https://gerrit.drem.io/gerrit/c/aws-glue-data-catalog-client-for-apache-hive-metastore/+/51718
+Project: aws-glue-data-catalog-client-for-apache-hive-metastore
+Branch: refs/heads/branch-3.4.0-dremio
