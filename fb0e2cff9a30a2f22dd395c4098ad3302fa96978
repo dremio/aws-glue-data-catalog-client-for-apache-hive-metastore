@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfcfb058_2f22cd57",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000715
+      },
+      "writtenOn": "2023-06-02T07:39:02Z",
+      "side": 1,
+      "message": "It is not expected for this commit to produce green test result as it is only part of the whole rebase process, with fixes coming in later in the chain.\nTip commit of this rebase https://gerrit.drem.io/gerrit/c/aws-glue-data-catalog-client-for-apache-hive-metastore/+/51727 is verified by jenkins with all tests reporting green, thus requesting manual +1 override for this one.",
+      "revId": "fb0e2cff9a30a2f22dd395c4098ad3302fa96978",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    }
+  ]
+}
