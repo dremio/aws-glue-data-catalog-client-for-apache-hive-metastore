@@ -18,7 +18,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <guava.version>14.0.1</guava.version>
-    <hive3.version>3.1.1-dremio-202305221349350248-9283ea6</hive3.version>
+    <hive3.version>3.1.1-dremio-202401090943560717-88d0cad</hive3.version>
     <aws.sdk.version>1.12.400</aws.sdk.version>
     <junit.version>4.11</junit.version>
     <mockito.version>1.10.19</mockito.version>
