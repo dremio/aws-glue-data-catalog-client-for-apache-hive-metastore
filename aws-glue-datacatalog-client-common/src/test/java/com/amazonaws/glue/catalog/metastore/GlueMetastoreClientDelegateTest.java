@@ -268,6 +268,15 @@ public class GlueMetastoreClientDelegateTest {
   }
 
   @Test
+  public void testCheckState() throws Exception {
+    when(glueClient.getDatabases(any(GetDatabasesRequest.class)))
+            .thenReturn(new GetDatabasesResult().withDatabaseList(getTestDatabase()));
+    metastoreClientDelegate.checkState();
+    // Ensure this gets invoked
+    verify(glueClient, times(1)).getDatabases(any(GetDatabasesRequest.class));
+  }
+
+  @Test
   public void testGetAllDatabasesPaginated() throws Exception {
     when(glueClient.getDatabases(any(GetDatabasesRequest.class)))
         .thenReturn(new GetDatabasesResult().withDatabaseList(testDb).withNextToken("token"))
