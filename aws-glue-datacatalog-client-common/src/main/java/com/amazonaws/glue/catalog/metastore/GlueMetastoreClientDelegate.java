@@ -306,6 +306,27 @@ public class GlueMetastoreClientDelegate {
     }
   }
 
+  /**
+   * Checks the state of the MetaStore by attempting to retrieve databases with a specified maximum result limit.
+   * If the Glue client can successfully fetch databases, the method completes successfully.
+   * If an AmazonServiceException occurs during the process, it is caught and wrapped in a HiveException using the catalogToHiveConverter.
+   * If any other exception occurs, a MetaException is thrown with the corresponding error message.
+   *
+   * @throws HiveException If an AmazonServiceException occurs and it needs to be wrapped in a HiveException.
+   * @throws MetaException If any other exception occurs during the Glue client state check.
+   * @throws TException    If an error occurs while interacting with the Thrift API.
+   * @see AWSGlue#getDatabases(GetDatabasesRequest)
+   */
+  public void checkState() throws TException {
+    try {
+      glueClient.getDatabases(new GetDatabasesRequest().withCatalogId(catalogId).withMaxResults(1));
+    } catch (AmazonServiceException e) {
+      throw catalogToHiveConverter.wrapInHiveException(e);
+    } catch (Exception e) {
+      throw new MetaException(e.getMessage());
+    }
+  }
+
   public void alterDatabase(String databaseName, org.apache.hadoop.hive.metastore.api.Database database) throws TException {
     checkArgument(StringUtils.isNotEmpty(databaseName), "databaseName cannot be null or empty");
     checkNotNull(database, "database cannot be null");

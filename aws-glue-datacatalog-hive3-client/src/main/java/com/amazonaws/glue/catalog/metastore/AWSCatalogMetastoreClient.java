@@ -299,6 +299,11 @@ public class AWSCatalogMetastoreClient implements IMetaStoreClient {
   }
 
   @Override
+  public void checkState() throws MetaException, TException {
+    glueMetastoreClientDelegate.checkState();
+  }
+
+  @Override
   public void alterDatabase(String databaseName, Database database) throws NoSuchObjectException, MetaException,
         TException {
     glueMetastoreClientDelegate.alterDatabase(databaseName, database);
