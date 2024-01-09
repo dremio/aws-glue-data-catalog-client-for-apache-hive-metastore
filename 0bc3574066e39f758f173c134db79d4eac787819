@@ -1,0 +1,7 @@
+Verified+1: jenkins (via gerrit) <jenkins@dremio.com>
+Code-Review+2: Adam Szita <adam.szita@dremio.com>
+Submitted-by: Laszlo Pinter <laszlo.pinter@dremio.com>
+Submitted-at: Tue, 09 Jan 2024 14:24:41 +0000
+Reviewed-on: https://gerrit.drem.io/gerrit/c/aws-glue-data-catalog-client-for-apache-hive-metastore/+/59021
+Project: aws-glue-data-catalog-client-for-apache-hive-metastore
+Branch: refs/heads/branch-3.4.0-dremio
