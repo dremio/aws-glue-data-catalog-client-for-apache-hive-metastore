@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "52807c37_9d40ba41",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000482
+      },
+      "writtenOn": "2024-01-09T15:09:36Z",
+      "side": 1,
+      "message": "Flaky DX-86367 Failing tests in aws-glue-data-catalog-client-for-apache-hive-metastore repo dremio branch",
+      "revId": "36810e55b65ebd4ad2331bb9dc0861de8bf00818",
+      "serverId": "8ca9cf2d-83f4-421d-8552-b009c9e056de"
+    }
+  ]
+}
