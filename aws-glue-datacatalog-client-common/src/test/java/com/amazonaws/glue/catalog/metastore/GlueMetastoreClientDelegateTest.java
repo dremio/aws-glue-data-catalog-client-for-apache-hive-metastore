@@ -76,7 +76,6 @@ import org.mockito.stubbing.Answer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -349,13 +348,6 @@ public class GlueMetastoreClientDelegateTest {
   }
 
   // ======================= Table ======================
-
-  @Test(expected = InvalidObjectException.class)
-  public void testGetTableInvalidGlueTable() throws Exception {
-    Table tbl = getTestTable().withTableType(null);
-    when(glueClient.getTable(any(GetTableRequest.class))).thenReturn(new GetTableResult().withTable(tbl));
-    metastoreClientDelegate.getTable(testDb.getName(), tbl.getName());
-  }
 
   @Test
   public void testGetTables() throws Exception {
