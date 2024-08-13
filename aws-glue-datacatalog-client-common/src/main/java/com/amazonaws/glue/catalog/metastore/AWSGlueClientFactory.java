@@ -74,7 +74,7 @@ public final class AWSGlueClientFactory implements GlueClientFactory {
       return decorateGlueClient(glueClientBuilder.build());
     } catch (Exception e) {
       String message = "Unable to build AWSGlueClient: " + e;
-      logger.error(message);
+      logger.error(message, e);
       throw new MetaException(message);
     }
   }
